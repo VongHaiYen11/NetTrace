@@ -268,9 +268,9 @@ curl -X POST http://localhost:3000/api/v1/analytics/query \
 <summary><b>4. Heatmap Density Analysis (<code>POST /api/v1/analytics/heatmap</code>)</b></summary>
 
 * Fetches heat distribution representing alarm density.
-* `mode=weekday` (hour of day x weekday name) or `mode=calendar` (hour of day x date string YYYY-MM-DD).
+* `mode=weekday` (hour of day x weekday name) or `mode=calendar` (day-by-day GitHub style contribution graph).
 
-**cURL Call:**
+**cURL Call (mode: weekday):**
 ```bash
 curl -X POST http://localhost:3000/api/v1/analytics/heatmap \
   -H "Content-Type: application/json" \
@@ -282,7 +282,7 @@ curl -X POST http://localhost:3000/api/v1/analytics/heatmap \
   }'
 ```
 
-**Response Example:**
+**Response Example (mode: weekday):**
 ```json
 {
   "success": true,
@@ -296,6 +296,26 @@ curl -X POST http://localhost:3000/api/v1/analytics/heatmap \
       "x": 9,
       "y": "Monday",
       "value": 105
+    }
+  ],
+  "meta": {
+    "execution_time_ms": 35
+  }
+}
+```
+
+**Response Example (mode: calendar):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "day": "2026-06-15",
+      "value": 120
+    },
+    {
+      "day": "2026-06-16",
+      "value": 240
     }
   ],
   "meta": {
