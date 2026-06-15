@@ -98,13 +98,18 @@ export class AnalyticsQueryRepository {
     const groupByClause = groupByFields.length > 0 ? `GROUP BY ${groupByFields.join(', ')}` : '';
     const orderByClause = groupByFields.length > 0 ? `ORDER BY value DESC` : '';
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const prewhereConditions = [
+      'time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}',
+    ];
+    if (conditions.length > 0) {
+      prewhereConditions.push(...conditions);
+    }
+    const prewhereClause = `PREWHERE ${prewhereConditions.join(' AND ')}`;
 
     const query = `
       SELECT ${selectClause}
       FROM alarms
-      PREWHERE time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}
-      ${whereClause}
+      ${prewhereClause}
       ${groupByClause}
       ${orderByClause}
       LIMIT {limit: UInt32}

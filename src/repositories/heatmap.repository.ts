@@ -31,7 +31,13 @@ export class HeatmapRepository {
     queryParams.from_time = fromStr;
     queryParams.to_time = toStr;
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const prewhereConditions = [
+      'time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}',
+    ];
+    if (conditions.length > 0) {
+      prewhereConditions.push(...conditions);
+    }
+    const prewhereClause = `PREWHERE ${prewhereConditions.join(' AND ')}`;
 
     let selectClause = '';
     let groupByClause = '';
@@ -47,8 +53,7 @@ export class HeatmapRepository {
     const query = `
       SELECT ${selectClause}
       FROM alarms
-      PREWHERE time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}
-      ${whereClause}
+      ${prewhereClause}
       ${groupByClause}
     `;
 

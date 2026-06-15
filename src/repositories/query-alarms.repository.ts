@@ -36,7 +36,7 @@ export class QueryAlarmsRepository {
     const fromStr = formatDate(from_time);
     const toStr = formatDate(to_time);
 
-    const { conditions, queryParams } = buildClickhouseFilters({
+    const { conditions: filterConditions, queryParams } = buildClickhouseFilters({
       severity: params.severity,
       status: params.status,
       device_id: params.device_id,
@@ -47,18 +47,27 @@ export class QueryAlarmsRepository {
     queryParams.to_time = toStr;
     queryParams.limit = limit;
 
-    // Keyset pagination cursor constraint
+    const prewhereConditions = [
+      'time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}',
+    ];
+    if (filterConditions.length > 0) {
+      prewhereConditions.push(...filterConditions);
+    }
+    const prewhereClause = `PREWHERE ${prewhereConditions.join(' AND ')}`;
+
+    // Keyset pagination cursor constraint (goes to WHERE)
+    const whereConditions: string[] = [];
     if (cursor_time && cursor_id) {
       const cursorTimeStr = formatDate(cursor_time);
       queryParams.cursor_time = cursorTimeStr;
       queryParams.cursor_id = cursor_id;
 
       if (sort_order === 'asc') {
-        conditions.push(
+        whereConditions.push(
           '(time_created > {cursor_time: DateTime} OR (time_created = {cursor_time: DateTime} AND alarm_id > {cursor_id: String}))',
         );
       } else {
-        conditions.push(
+        whereConditions.push(
           '(time_created < {cursor_time: DateTime} OR (time_created = {cursor_time: DateTime} AND alarm_id < {cursor_id: String}))',
         );
       }
@@ -72,7 +81,7 @@ export class QueryAlarmsRepository {
     const orderColumn = sortFieldMap[sort_by] || 'time_created';
     const orderDirection = sort_order === 'asc' ? 'ASC' : 'DESC';
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
     const dataQuery = `
       SELECT 
@@ -86,25 +95,16 @@ export class QueryAlarmsRepository {
         raw_log,
         description
       FROM alarms
-      PREWHERE time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}
+      ${prewhereClause}
       ${whereClause}
       ORDER BY ${orderColumn} ${orderDirection}, alarm_id ${orderDirection}
       LIMIT {limit: UInt32}
     `;
 
-    // Filter count query (excluding cursor constraints)
-    const countConditions = [...conditions];
-    if (cursor_time && cursor_id) {
-      countConditions.pop();
-    }
-    const countWhereClause =
-      countConditions.length > 0 ? `WHERE ${countConditions.join(' AND ')}` : '';
-
     const countQuery = `
       SELECT count() as total
       FROM alarms
-      PREWHERE time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}
-      ${countWhereClause}
+      ${prewhereClause}
     `;
 
     const [dataResult, countResult] = await Promise.all([
@@ -156,7 +156,13 @@ export class QueryAlarmsRepository {
     const orderColumn = sortFieldMap[sort_by] || 'time_created';
     const orderDirection = sort_order === 'asc' ? 'ASC' : 'DESC';
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const prewhereConditions = [
+      'time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}',
+    ];
+    if (conditions.length > 0) {
+      prewhereConditions.push(...conditions);
+    }
+    const prewhereClause = `PREWHERE ${prewhereConditions.join(' AND ')}`;
 
     let limitClause = '';
     if (limit) {
@@ -176,8 +182,7 @@ export class QueryAlarmsRepository {
         raw_log,
         description
       FROM alarms
-      PREWHERE time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}
-      ${whereClause}
+      ${prewhereClause}
       ORDER BY ${orderColumn} ${orderDirection}, alarm_id ${orderDirection}
       ${limitClause}
     `;

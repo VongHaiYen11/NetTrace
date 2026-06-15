@@ -61,6 +61,7 @@ export class DeviceRepository {
     province?: string[];
   }): Promise<{ deviceIds: string[]; durationMs: number }> {
     const conditions: string[] = [];
+    const joins: string[] = [];
     const params: unknown[] = [];
     let paramIndex = 1;
 
@@ -69,16 +70,25 @@ export class DeviceRepository {
       params.push(filters.device_type);
     }
     if (filters.vendor && filters.vendor.length > 0) {
+      joins.push('INNER JOIN vendor v ON d.vendor_id = v.vendor_id');
       conditions.push(`v.name = ANY($${paramIndex++})`);
       params.push(filters.vendor);
     }
-    if (filters.station && filters.station.length > 0) {
-      conditions.push(`s.name = ANY($${paramIndex++})`);
-      params.push(filters.station);
-    }
-    if (filters.province && filters.province.length > 0) {
-      conditions.push(`s.province = ANY($${paramIndex++})`);
-      params.push(filters.province);
+
+    const needsStation =
+      (filters.station && filters.station.length > 0) ||
+      (filters.province && filters.province.length > 0);
+
+    if (needsStation) {
+      joins.push('INNER JOIN station s ON d.station_id = s.station_id');
+      if (filters.station && filters.station.length > 0) {
+        conditions.push(`s.name = ANY($${paramIndex++})`);
+        params.push(filters.station);
+      }
+      if (filters.province && filters.province.length > 0) {
+        conditions.push(`s.province = ANY($${paramIndex++})`);
+        params.push(filters.province);
+      }
     }
 
     if (conditions.length === 0) {
@@ -88,8 +98,7 @@ export class DeviceRepository {
     const query = `
       SELECT DISTINCT d.device_id
       FROM device d
-      LEFT JOIN vendor v ON d.vendor_id = v.vendor_id
-      LEFT JOIN station s ON d.station_id = s.station_id
+      ${joins.join('\n      ')}
       WHERE ${conditions.join(' AND ')}
     `;
 
