@@ -9,7 +9,26 @@ export class HeatmapService {
   ) {}
 
   async getHeatmap(
-    params: HeatmapParams & {
+    params: {
+      mode: 'weekday' | 'calendar';
+      filters?: {
+        from_time?: Date;
+        to_time?: Date;
+        severity?: string[];
+        status?: string[];
+        device_id?: string[];
+        error_code?: string[];
+        device_type?: string[];
+        vendor?: string[];
+        station?: string[];
+        province?: string[];
+      };
+      from_time?: Date;
+      to_time?: Date;
+      severity?: string[];
+      status?: string[];
+      device_id?: string[];
+      error_code?: string[];
       device_type?: string[];
       vendor?: string[];
       station?: string[];
@@ -17,8 +36,25 @@ export class HeatmapService {
     },
     metrics: ServiceMetrics,
   ) {
-    const { device_type, vendor, station, province } = params;
-    let finalDeviceIds = params.device_id;
+    const mode = params.mode;
+    const filters = params.filters || {};
+
+    const from_time = filters.from_time || params.from_time;
+    const to_time = filters.to_time || params.to_time;
+    const severity = filters.severity || params.severity;
+    const status = filters.status || params.status;
+    const device_id = filters.device_id || params.device_id;
+    const error_code = filters.error_code || params.error_code;
+    const device_type = filters.device_type || params.device_type;
+    const vendor = filters.vendor || params.vendor;
+    const station = filters.station || params.station;
+    const province = filters.province || params.province;
+
+    if (!from_time || !to_time) {
+      throw new Error('Missing from_time or to_time in heatmap parameters');
+    }
+
+    let finalDeviceIds = device_id;
 
     // 1. Resolve PostgreSQL device filters if present
     if (
@@ -40,9 +76,9 @@ export class HeatmapService {
         return [];
       }
 
-      if (params.device_id && params.device_id.length > 0) {
+      if (device_id && device_id.length > 0) {
         const set = new Set(deviceIds);
-        finalDeviceIds = params.device_id.filter((id) => set.has(id));
+        finalDeviceIds = device_id.filter((id) => set.has(id));
         if (finalDeviceIds.length === 0) {
           return [];
         }
@@ -52,13 +88,13 @@ export class HeatmapService {
     }
 
     const { rows, durationMs } = await this.heatmapRepo.getHeatmap({
-      from_time: params.from_time,
-      to_time: params.to_time,
-      mode: params.mode,
-      severity: params.severity,
-      status: params.status,
+      from_time,
+      to_time,
+      mode,
+      severity,
+      status,
       device_id: finalDeviceIds,
-      error_code: params.error_code,
+      error_code,
     });
 
     metrics.clickhouse_query_time_ms += durationMs;
@@ -80,7 +116,7 @@ export class HeatmapService {
       const value = r.count !== undefined ? Number(r.count) : 0;
 
       let y: string | number = '';
-      if (params.mode === 'weekday') {
+      if (mode === 'weekday') {
         const dayNum = Number(r.day_of_week);
         y = weekdayNames[dayNum - 1] || 'Unknown';
       } else {
