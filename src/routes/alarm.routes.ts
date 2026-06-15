@@ -213,8 +213,10 @@ const router = Router();
  *         name: limit
  *         schema:
  *           type: integer
+ *           minimum: 1
  *           maximum: 1000
  *           default: 100
+ *           example: 100
  *         description: Page limit. Maximum 1000.
  *       - in: query
  *         name: severity
@@ -442,7 +444,9 @@ router.get('/analytics/summary', validateQuery(SummarySchema), summaryController
  *                       type: string
  *               limit:
  *                 type: integer
+ *                 minimum: 1
  *                 default: 20
+ *                 example: 20
  *     responses:
  *       200:
  *         description: Query executed successfully.
@@ -551,6 +555,8 @@ router.post('/analytics/heatmap', validateBody(HeatmapSchema), heatmapController
  *                     enum: [asc, desc]
  *                   limit:
  *                     type: integer
+ *                     minimum: 1
+ *                     example: 100
  *     responses:
  *       200:
  *         description: Stream download.
