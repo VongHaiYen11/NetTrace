@@ -1,22 +1,110 @@
-# NetTrace Alarms Analytics API
+# ⚡ NetTrace Alarms Analytics API
 
-A high-performance Express.js backend API implemented in TypeScript, combining **ClickHouse** (analytical logs) and **PostgreSQL** (relational configuration metadata) to deliver sub-second analytics, aggregations, and data federation for NetTrace alarms.
+<div align="center">
+  <img src="https://img.shields.io/badge/node-%3E%3D20.0.0-blue.svg?style=for-the-badge&logo=node.js" alt="Node.js" />
+  <img src="https://img.shields.io/badge/TypeScript-5.4-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Express-4.19-lightgrey?style=for-the-badge&logo=express" alt="Express" />
+  <img src="https://img.shields.io/badge/ClickHouse-OLAP-brightgreen?style=for-the-badge&logo=clickhouse" alt="ClickHouse" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-blue?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Validation-Zod-purple?style=for-the-badge&logo=zod" alt="Zod" />
+</div>
+
+<br />
+
+A high-performance Express.js backend API implemented in TypeScript. It combines **ClickHouse** (for high-speed analytical logs) and **PostgreSQL** (for relational configuration metadata) to deliver sub-second analytics, aggregations, and data federation for NetTrace network alarms.
 
 ---
 
-## 📌 Architecture Design
+## 📌 Table of Contents
 
-The project uses a standard clean layered architecture:
+* [🏗️ Architecture Design](#%EF%B8%8F-architecture-design)
+* [🔗 Data Federation Flow](#-data-federation-flow)
+* [⚡ Query Optimization & Rules of Thumb](#-query-optimization--rules-of-thumb)
+* [📂 Folder Structure](#-folder-structure)
+* [🧭 Implemented Endpoints & Examples](#-implemented-endpoints--examples)
+  1. [Detail Queries (`GET /api/v1/alarms`)](#1-detail-queries-get-apiv1alarms)
+  2. [Operational Summary KPIs (`GET /api/v1/analytics/summary`)](#2-operational-summary-kpis-get-apiv1analyticssummary)
+  3. [Dynamic Analytics Query (`POST /api/v1/analytics/query`)](#3-dynamic-analytics-query-post-apiv1analyticsquery)
+  4. [Heatmap Density Analysis (`POST /api/v1/analytics/heatmap`)](#4-heatmap-density-analysis-post-apiv1analyticsheatmap)
+  5. [Stream Export (`POST /api/v1/export`)](#5-stream-export-post-apiv1export)
+* [🛠️ Tech Stack & Libraries](#%EF%B8%8F-tech-stack--libraries)
+* [🚀 Setting Up & Running](#-setting-up--running)
 
-```text
-Request ➔ Route ➔ Controller ➔ Service ➔ Repository ➔ Database
+---
+
+## 🏗️ Architecture Design
+
+The project is structured according to a **Clean Layered Architecture**, ensuring strict one-way dependency flow:
+
+```mermaid
+graph TD
+    classDef layer fill:#f4f4f9,stroke:#555,stroke-width:1px,rx:5px,ry:5px;
+    classDef db fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px,rx:8px,ry:8px;
+
+    Client([Client / Webapp]) -->|HTTP Request| Route[Route Layer]:::layer
+    Route -->|Zod Validator Middleware| Controller[Controller Layer]:::layer
+    Controller -->|Delegates to| Service[Service Layer]:::layer
+    Service -->|Invokes| Repository[Repository Layer]:::layer
+    Repository -->|Queries| PostgreSQL[(PostgreSQL Database<br/>Metadata)]:::db
+    Repository -->|Queries| ClickHouse[(ClickHouse Database<br/>Analytical Alarms)]:::db
 ```
 
-* **Route Layer**: Matches incoming endpoints, sets up Swagger documentation, and validates requests using Zod validation.
-* **Controller Layer**: Handles incoming HTTP requests, extracts validated parameters (both query parameters and JSON body), delegates execution to the service layer, and shapes JSON outputs.
-* **Service Layer**: Manages business logic, calculates operational durations, aggregates data in memory, and performs **Data Federation**.
-* **Repository Layer**: Generates optimized ClickHouse queries and parameter-bound PostgreSQL queries.
-* **Database Connection Layer**: Manages PostgreSQL connection pools and the ClickHouse singleton client instance.
+* 🧭 **Route Layer**: Resolves endpoints, registers request schema validators, and declares Swagger OpenAPI documentation.
+* 🎮 **Controller Layer**: Handles incoming HTTP requests, extracts validated payload from `res.locals`, calls the Service layer, and formats the output.
+* 🧠 **Service Layer**: Manages business logic, coordinates the **Data Federation** process, and performs in-memory mappings.
+* 📦 **Repository Layer**: Generates optimized raw SQL and ClickHouse query statements.
+* 🗄️ **Database Layer**: Manages PostgreSQL connection pools (max 20, 5s timeout) and the ClickHouse HTTP singleton client (30s timeout).
+
+---
+
+## 🔗 Data Federation Flow
+
+To prevent database bottlenecks, PostgreSQL and ClickHouse are **never joined directly**. Federation is managed in-memory at the application level:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Controller
+    participant Service
+    participant Postgres as PostgreSQL (Metadata)
+    participant ClickHouse as ClickHouse (Alarms)
+
+    Client ->> Controller: POST /api/v1/export (filters)
+    Controller ->> Service: exportAlarms(params)
+    
+    alt Has Postgres Filters (device_type, vendor, station, province)
+        Service ->> Postgres: getDeviceIdsByFilters()
+        Postgres -->> Service: List of matching device_ids
+    end
+    
+    Service ->> ClickHouse: queryAlarmsStream(device_ids, severity, status, etc.)
+    ClickHouse -->> Service: Stream of Raw Alarms
+    
+    Service ->> Postgres: fetch all devices & errors metadata
+    Postgres -->> Service: Devices & Errors lookup maps
+    
+    Service ->> Service: Enrich & map Alarms using RAM HashMap O(1)
+    Service ->> Client: Pipe streamed CSV/Excel file directly (constant memory)
+```
+
+---
+
+## ⚡ Query Optimization & Rules of Thumb
+
+To maintain a sub-second response SLA (P95 < 500ms for detail queries, P95 < 2s for analytics), we apply the following optimizations:
+
+* 🛡️ **No `SELECT *`**: Queries explicitly declare target fields to minimize disk read and memory footprint.
+* ✂️ **Partition Pruning**: The time range filter (`from_time` and `to_time`) is mandatory for all query/analytics APIs to prune partition directories. The query range is capped at **90 days**.
+* 🔍 **`PREWHERE` Clause**: Filtering by `time_created` utilizes ClickHouse's `PREWHERE` to evaluate conditions before loading other columns.
+* 📄 **No `OFFSET` Pagination**: Large-dataset pagination is achieved using **Keyset/Cursor Pagination** (`cursor_time`, `cursor_id`), resulting in $O(\log N)$ performance.
+* 🔒 **Query Guardrails**: 
+  * Capped maximum Top-N results ($N \le 1000$).
+  * Capped maximum `group_by` columns to 3.
+  * Strict sorting whitelist (`time_created`, `severity`, `status`, `count`).
+  * Enforced database timeouts: Postgres (`5s`) and ClickHouse (`30s`).
+
+---
 
 ## 📂 Folder Structure
 
@@ -36,51 +124,13 @@ src/
 
 ---
 
-## 🔗 Data Federation Mechanism
-
-To ensure maximum performance and separation of concerns, the PostgreSQL and ClickHouse databases are **never joined directly**. Instead, federation is managed at the Node.js application level:
-
-1. **Resolve Postgres filters**: If metadata filters like `device_type`, `vendor`, `station`, or `province` are specified, query PostgreSQL first to resolve the matching list of `device_id`s.
-2. **Query Clickhouse**: Fetch alarm records or aggregate values from ClickHouse using optimized filters (including the resolved `device_id` list) and indices.
-3. **Extract and Map metadata**: In the Service layer, map the ClickHouse rows with matching metadata fetched from PostgreSQL using $O(1)$ Hash Map lookups.
-4. **Stitch / Coalesce**: Merge the Postgres metadata fields (`device_details`, `error_details`) into the alarms payload or perform client-side grouping (e.g., aggregating count by `device_type`) before responding to the client.
-
----
-
-## ⚡ Query Optimization & Rules of Thumb
-
-To ensure the system handles hundreds of millions of alarm records efficiently and maintains sub-second query latency (SLA: P95 < 500ms for queries, P95 < 2s for analytics), the following rules of thumb and optimization techniques are strictly followed across the application:
-
-### 1. Data Federation (No Direct Joins)
-* **Rule**: PostgreSQL and ClickHouse must **never** be joined directly.
-* **Mechanism**: 
-  1. If PostgreSQL metadata filters are provided, query PostgreSQL first to resolve the matching `device_id` list.
-  2. Query ClickHouse using the resolved `device_id` list.
-  3. Enrich the returned ClickHouse rows with PostgreSQL metadata (`device_details`, `error_details`) in the Service layer using $O(1)$ Hash Map lookups on RAM.
-
-### 2. ClickHouse Performance Optimization
-* **Partition Pruning**: All queries must specify `from_time` and `to_time` to allow ClickHouse to exclude irrelevant data partitions (Partition Pruning). The time range must not exceed **90 days**.
-* **PREWHERE Clauses**: Time-range filtering must be performed in the `PREWHERE` clause (e.g., `PREWHERE time_created BETWEEN ...`) to load only the required columns and filter matching rows before reading the rest of the fields.
-* **No `SELECT *`**: All queries explicitly list the required columns to leverage ClickHouse's columnar-store architecture.
-* **LowCardinality fields**: Columns with low cardinality, such as `severity` and `status`, are stored as `LowCardinality(String)` to increase compression and speed up sorting/grouping.
-
-### 3. Keyset (Cursor-Based) Pagination
-* **Rule**: Traditional `OFFSET` pagination is forbidden on large datasets.
-* **Mechanism**: Pagination uses `cursor_time` and `cursor_id` to query only rows occurring before/after the current cursor (`(time_created, alarm_id) < (cursor_time, cursor_id)`), ensuring consistent $O(\log N)$ query time.
-
-### 4. Query Safety & Guardrails
-* **Max Top-N**: Limit for query results is strictly capped at $N \le 1000$.
-* **Max Group By Columns**: Group-by operations are limited to a maximum of 3 columns.
-* **Sorting Whitelist**: Sorting is restricted to whitelisted fields (`time_created`, `severity`, `status`, `count`). Raw SQL string inputs from clients are never injected directly into ORDER BY clauses.
-* **Database Timeouts**: PostgreSQL query timeout is capped at `5s` and ClickHouse is capped at `30s` to prevent long-running queries from locking system resources.
-
----
-
 ## 🧭 Implemented Endpoints & Examples
 
-All endpoints are registered under the `/api/v1` namespace. Below are calling examples and JSON response structures:
+All endpoints are registered under the `/api/v1` namespace. Click below to view cURL examples and JSON response structures.
 
-### 1. Detail Queries (`GET /api/v1/alarms`)
+<details>
+<summary><b>1. Detail Queries (<code>GET /api/v1/alarms</code>)</b></summary>
+
 * Retrieves a list of alarms with filters on `severity`, `status`, `device_id`, and `error_code`.
 * Supports federated filters: `device_type`, `vendor`, `station`, and `province`.
 * Uses keyset pagination (`cursor_time`, `cursor_id`) instead of `OFFSET`.
@@ -136,10 +186,11 @@ curl -X GET "http://localhost:3000/api/v1/alarms?limit=1&severity=critical"
   }
 }
 ```
+</details>
 
----
+<details>
+<summary><b>2. Operational Summary KPIs (<code>GET /api/v1/analytics/summary</code>)</b></summary>
 
-### 2. Operational Summary KPIs (`GET /api/v1/analytics/summary`)
 * Returns overall count aggregates for KPI cards.
 * Fully supports standard ClickHouse and federated PostgreSQL metadata filters.
 
@@ -164,10 +215,11 @@ curl -X GET "http://localhost:3000/api/v1/analytics/summary?severity=critical"
   }
 }
 ```
+</details>
 
----
+<details>
+<summary><b>3. Dynamic Analytics Query (<code>POST /api/v1/analytics/query</code>)</b></summary>
 
-### 3. Dynamic Analytics Query (`POST /api/v1/analytics/query`)
 * Flexible query aggregation engine serving charts (Pie, Bar, Line, Top-N).
 * Supports metric types (`count`, `avg_duration`, `max_duration`, `affected_devices`), native group-by, time bucketing, and federated Postgres dimensions.
 
@@ -205,10 +257,11 @@ curl -X POST http://localhost:3000/api/v1/analytics/query \
   }
 }
 ```
+</details>
 
----
+<details>
+<summary><b>4. Heatmap Density Analysis (<code>POST /api/v1/analytics/heatmap</code>)</b></summary>
 
-### 4. Heatmap Density Analysis (`POST /api/v1/analytics/heatmap`)
 * Fetches heat distribution representing alarm density.
 * `mode=weekday` (hour of day x weekday name) or `mode=calendar` (hour of day x date string YYYY-MM-DD).
 
@@ -245,12 +298,13 @@ curl -X POST http://localhost:3000/api/v1/analytics/heatmap \
   }
 }
 ```
+</details>
 
----
+<details>
+<summary><b>5. Stream Export (<code>POST /api/v1/export</code>)</b></summary>
 
-### 5. Stream Export (`POST /api/v1/export`)
 * Streams a full/filtered copy of alarm telemetry formatted as `csv` or `xlsx` spreadsheet download.
-* Supports **dynamic column selection** via the `columns` array (e.g., `["alarm_id", "time_created", "severity", "status"]`). If omitted, all columns are exported.
+* Supports **dynamic column selection** via the `columns` array. If omitted, all columns are exported.
 * Supports all table-like filters, sorting (`sort_by`, `sort_order`), and size limit (`limit`) inside the `filters` object.
 * Uses native ClickHouse streams and `exceljs` streaming pipeline to maintain $O(1)$ memory usage.
 
@@ -271,11 +325,11 @@ curl -X POST http://localhost:3000/api/v1/export \
 ```
 
 *Note: The command streams the download and saves the output directly to the local file `alarms_export.csv`.*
-
+</details>
 
 ---
 
-## 🛠 Tech Stack & Libraries
+## 🛠️ Tech Stack & Libraries
 
 * **Core**: Node.js (ES2022+ ESM) & TypeScript
 * **Router Framework**: Express.js
