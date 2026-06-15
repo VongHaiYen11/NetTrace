@@ -138,8 +138,8 @@ export class ExportService {
       }
 
       if (filters.device_id && filters.device_id.length > 0) {
-        const set = new Set(deviceIds);
-        finalDeviceIds = filters.device_id.filter((id) => set.has(id));
+        const lowerSet = new Set(deviceIds.map((id) => id.toLowerCase()));
+        finalDeviceIds = filters.device_id.filter((id) => lowerSet.has(id.toLowerCase()));
         if (finalDeviceIds.length === 0) {
           this.writeEmptyResponse(res, format, columns);
           return;
@@ -171,12 +171,12 @@ export class ExportService {
     metrics.postgres_query_time_ms += Math.round(performance.now() - startPgMeta);
 
     const deviceMap = devicesRes.devices.reduce<Record<string, any>>((acc, d) => {
-      acc[d.device_id] = d;
+      acc[d.device_id.toLowerCase()] = d;
       return acc;
     }, {});
 
     const errorMap = errorsRes.errors.reduce<Record<string, any>>((acc, e) => {
-      acc[e.error_code] = e;
+      acc[e.error_code.toLowerCase()] = e;
       return acc;
     }, {});
 
@@ -217,8 +217,8 @@ export class ExportService {
               const row = JSON.parse(item);
               recordsCount++;
 
-              const dev = deviceMap[row.device_id] || {};
-              const err = errorMap[row.error_code] || {};
+              const dev = (row.device_id ? deviceMap[row.device_id.toLowerCase()] : null) || {};
+              const err = (row.error_code ? errorMap[row.error_code.toLowerCase()] : null) || {};
 
               const values = activeCols.map((col) => col.getValue(row, dev, err));
 
@@ -285,8 +285,8 @@ export class ExportService {
               const row = JSON.parse(item);
               recordsCount++;
 
-              const dev = deviceMap[row.device_id] || {};
-              const err = errorMap[row.error_code] || {};
+              const dev = (row.device_id ? deviceMap[row.device_id.toLowerCase()] : null) || {};
+              const err = (row.error_code ? errorMap[row.error_code.toLowerCase()] : null) || {};
 
               const rowData: Record<string, any> = {};
               for (const col of activeCols) {

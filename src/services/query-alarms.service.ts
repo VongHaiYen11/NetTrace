@@ -98,21 +98,21 @@ export class QueryAlarmsService {
     metrics.postgres_query_time_ms += pgDuration;
 
     const deviceMap = deviceRes.devices.reduce<Record<string, DeviceMetadata>>((acc, d) => {
-      acc[d.device_id] = d;
+      acc[d.device_id.toLowerCase()] = d;
       return acc;
     }, {});
 
     const errorMap = errorRes.errors.reduce<Record<string, ErrorMetadata>>((acc, e) => {
-      acc[e.error_code] = e;
+      acc[e.error_code.toLowerCase()] = e;
       return acc;
     }, {});
 
     const enrichedAlarms = alarms.map((alarm) => ({
       alarm_id: alarm.alarm_id,
       error_code: alarm.error_code,
-      error_details: errorMap[alarm.error_code] || null,
+      error_details: errorMap[alarm.error_code.toLowerCase()] || null,
       device_id: alarm.device_id,
-      device_details: deviceMap[alarm.device_id] || null,
+      device_details: deviceMap[alarm.device_id.toLowerCase()] || null,
       time_created: alarm.time_created,
       time_solved: alarm.time_solved,
       status: alarm.status,

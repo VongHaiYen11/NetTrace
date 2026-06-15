@@ -46,9 +46,9 @@ export class SummaryRepository {
     const query = `
       SELECT
         count() as total_alarms,
-        countIf(status = 'active' OR status = 'ACTIVE') as active_alarms,
-        countIf(status = 'closed' OR status = 'CLOSED' OR status = 'solved' OR status = 'SOLVED') as closed_alarms,
-        countIf(severity = 'critical' OR severity = 'CRITICAL') as critical_alarms,
+        countIf(lower(status) = 'active') as active_alarms,
+        countIf(lower(status) = 'closed' OR lower(status) = 'solved') as closed_alarms,
+        countIf(lower(severity) = 'critical') as critical_alarms,
         uniqExact(device_id) as affected_devices
       FROM alarms
       ${prewhereClause}

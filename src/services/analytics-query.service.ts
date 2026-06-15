@@ -104,7 +104,7 @@ export class AnalyticsQueryService {
     metrics.postgres_query_time_ms += Math.round(performance.now() - startPg);
 
     const deviceMap = devices.reduce<Record<string, DeviceMetadata>>((acc, d) => {
-      acc[d.device_id] = d;
+      acc[d.device_id.toLowerCase()] = d;
       return acc;
     }, {});
 
@@ -115,7 +115,7 @@ export class AnalyticsQueryService {
     > = {};
 
     for (const row of rows) {
-      const dev = deviceMap[row.device_id as string];
+      const dev = row.device_id ? deviceMap[(row.device_id as string).toLowerCase()] : undefined;
 
       const resolvedKeys: Record<string, unknown> = {};
       if (row.time_bucket) resolvedKeys.time_bucket = row.time_bucket;

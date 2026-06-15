@@ -27,10 +27,12 @@ export class ErrorRepository {
         domain,
         default_severity
       FROM error
-      WHERE error_code = ANY($1)
+      WHERE LOWER(error_code) = ANY($1)
     `;
 
-    const { rows, durationMs } = await executePgQuery<ErrorMetadata>(query, [codes]);
+    const { rows, durationMs } = await executePgQuery<ErrorMetadata>(query, [
+      codes.map((c) => c.toLowerCase()),
+    ]);
     return { errors: rows, durationMs };
   }
 

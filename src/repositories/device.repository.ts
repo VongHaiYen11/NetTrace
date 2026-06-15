@@ -44,10 +44,12 @@ export class DeviceRepository {
       FROM device d
       LEFT JOIN vendor v ON d.vendor_id = v.vendor_id
       LEFT JOIN station s ON d.station_id = s.station_id
-      WHERE d.device_id = ANY($1)
+      WHERE LOWER(d.device_id) = ANY($1)
     `;
 
-    const { rows, durationMs } = await executePgQuery<DeviceMetadata>(query, [ids]);
+    const { rows, durationMs } = await executePgQuery<DeviceMetadata>(query, [
+      ids.map((id) => id.toLowerCase()),
+    ]);
     return { devices: rows, durationMs };
   }
 
@@ -66,13 +68,13 @@ export class DeviceRepository {
     let paramIndex = 1;
 
     if (filters.device_type && filters.device_type.length > 0) {
-      conditions.push(`d.device_type = ANY($${paramIndex++})`);
-      params.push(filters.device_type);
+      conditions.push(`LOWER(d.device_type) = ANY($${paramIndex++})`);
+      params.push(filters.device_type.map((s) => s.toLowerCase()));
     }
     if (filters.vendor && filters.vendor.length > 0) {
       joins.push('INNER JOIN vendor v ON d.vendor_id = v.vendor_id');
-      conditions.push(`v.name = ANY($${paramIndex++})`);
-      params.push(filters.vendor);
+      conditions.push(`LOWER(v.name) = ANY($${paramIndex++})`);
+      params.push(filters.vendor.map((s) => s.toLowerCase()));
     }
 
     const needsStation =
@@ -82,12 +84,12 @@ export class DeviceRepository {
     if (needsStation) {
       joins.push('INNER JOIN station s ON d.station_id = s.station_id');
       if (filters.station && filters.station.length > 0) {
-        conditions.push(`s.name = ANY($${paramIndex++})`);
-        params.push(filters.station);
+        conditions.push(`LOWER(s.name) = ANY($${paramIndex++})`);
+        params.push(filters.station.map((s) => s.toLowerCase()));
       }
       if (filters.province && filters.province.length > 0) {
-        conditions.push(`s.province = ANY($${paramIndex++})`);
-        params.push(filters.province);
+        conditions.push(`LOWER(s.province) = ANY($${paramIndex++})`);
+        params.push(filters.province.map((s) => s.toLowerCase()));
       }
     }
 
