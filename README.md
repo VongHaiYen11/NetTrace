@@ -77,7 +77,7 @@ To maintain a sub-second response SLA (P95 < 500ms for detail queries, P95 < 2s 
 * ✂️ **Partition Pruning**: The time range filter (`from_time` and `to_time`) is mandatory for all query/analytics APIs to prune partition directories. The query range is capped at **90 days**.
 * 🔍 **`PREWHERE` Clause**: Dynamic metadata filter conditions (`status`, `severity`, `device_id`, `error_code`) are explicitly placed in the ClickHouse `PREWHERE` clause along with `time_created`. This forces ClickHouse to perform primary key pruning first and avoid loading large string columns (`raw_log`, `description`) into RAM for discarded rows.
 * 🔗 **Dynamic PostgreSQL Joins**: The PostgreSQL query builder dynamically adds `INNER JOIN` statements only when filtering on vendor/station metadata. If filtering only on `device_type`, no joins are performed.
-* 📄 **No `OFFSET` Pagination**: Large-dataset pagination is achieved using **Keyset/Cursor Pagination** (`cursor_time`, `cursor_id`), resulting in $O(\log N)$ performance.
+* 📄 **Offset-based Pagination**: API pagination is achieved using offset and limit parameters (`offset`, `limit`).
 * 🔒 **Query Guardrails**: 
   * Capped maximum Top-N results ($N \le 1000$).
   * Capped maximum `group_by` columns to 3.
@@ -138,11 +138,11 @@ All endpoints are registered under the `/api/v1` namespace. Click below to view 
 
 * Retrieves a list of alarms with filters on `severity`, `status`, `device_id`, and `error_code`.
 * Supports federated filters: `device_type`, `vendor`, `station`, and `province`.
-* Uses keyset pagination (`cursor_time`, `cursor_id`) instead of `OFFSET`.
+* Uses offset-based pagination (`offset`, `limit`).
 
 **cURL Call:**
 ```bash
-curl -X GET "http://localhost:3000/api/v1/alarms?limit=1&severity=critical"
+curl -X GET "http://localhost:3000/api/v1/alarms?limit=1&offset=0&severity=critical"
 ```
 
 **Response Example:**

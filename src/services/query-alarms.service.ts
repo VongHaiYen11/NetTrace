@@ -62,8 +62,7 @@ export class QueryAlarmsService {
     const clickhouseParams: QueryAlarmsParams = {
       from_time: params.from_time,
       to_time: params.to_time,
-      cursor_time: params.cursor_time,
-      cursor_id: params.cursor_id,
+      offset: params.offset,
       limit: params.limit,
       severity: params.severity,
       status: params.status,

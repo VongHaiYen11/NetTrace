@@ -185,7 +185,7 @@ const router = Router();
  * /api/v1/alarms:
  *   get:
  *     summary: Query alarms
- *     description: Retrieve list of alarms with filtering, keyset pagination (no OFFSET), sorting, and PostgreSQL data federation.
+ *     description: Retrieve list of alarms with filtering, offset-based pagination, sorting, and PostgreSQL data federation.
  *     tags:
  *       - Alarms
  *     parameters:
@@ -200,15 +200,13 @@ const router = Router();
  *           type: string
  *         description: End time (ISO-8601). Defaults to now.
  *       - in: query
- *         name: cursor_time
+ *         name: offset
  *         schema:
- *           type: string
- *         description: Timestamp of the last record from the previous page for keyset pagination.
- *       - in: query
- *         name: cursor_id
- *         schema:
- *           type: string
- *         description: ID of the last record from the previous page for keyset pagination.
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *           example: 0
+ *         description: Pagination offset.
  *       - in: query
  *         name: limit
  *         schema:
@@ -288,6 +286,9 @@ const router = Router();
  *                 meta:
  *                   type: object
  *                   properties:
+ *                     offset:
+ *                       type: integer
+ *                       example: 0
  *                     limit:
  *                       type: integer
  *                       example: 100

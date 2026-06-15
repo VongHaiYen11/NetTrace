@@ -50,10 +50,9 @@ describe('Validation Layer Tests', () => {
     it('should parse valid parameters and supply defaults', () => {
       const parsed = QueryAlarmsSchema.parse({});
       expect(parsed.limit).toBe(100);
+      expect(parsed.offset).toBe(0);
       expect(parsed.sort_by).toBe('timestamp');
       expect(parsed.sort_order).toBe('desc');
-      expect(parsed.cursor_time).toBeUndefined();
-      expect(parsed.cursor_id).toBeUndefined();
     });
 
     it('should parse array filters correctly from strings', () => {

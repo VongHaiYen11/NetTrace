@@ -14,6 +14,7 @@ export class QueryAlarmsController {
       const { alarms, total } = await this.queryAlarmsService.queryAlarms(queryParams, metrics);
 
       return sendSuccess(res, alarms, start, {
+        offset: queryParams.offset,
         limit: queryParams.limit,
         total,
       });

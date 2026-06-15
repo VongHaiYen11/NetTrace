@@ -98,6 +98,7 @@ describe('Service Layer Tests', () => {
       const params = {
         from_time: new Date(),
         to_time: new Date(),
+        offset: 0,
         limit: 10,
         sort_by: 'timestamp' as const,
         sort_order: 'desc' as const,
@@ -132,6 +133,7 @@ describe('Service Layer Tests', () => {
       const params = {
         from_time: new Date(),
         to_time: new Date(),
+        offset: 0,
         limit: 10,
         device_type: ['Switch'],
         sort_by: 'timestamp' as const,

@@ -16,8 +16,7 @@ export interface AlarmRecord {
 export interface QueryAlarmsParams {
   from_time: Date;
   to_time: Date;
-  cursor_time?: Date;
-  cursor_id?: string;
+  offset: number;
   limit: number;
   severity?: string[];
   status?: string[];
@@ -31,7 +30,7 @@ export class QueryAlarmsRepository {
   async queryAlarms(
     params: QueryAlarmsParams,
   ): Promise<{ alarms: AlarmRecord[]; total: number; durationMs: number }> {
-    const { from_time, to_time, cursor_time, cursor_id, limit, sort_by, sort_order } = params;
+    const { from_time, to_time, offset, limit, sort_by, sort_order } = params;
 
     const fromStr = formatDate(from_time);
     const toStr = formatDate(to_time);
@@ -46,6 +45,7 @@ export class QueryAlarmsRepository {
     queryParams.from_time = fromStr;
     queryParams.to_time = toStr;
     queryParams.limit = limit;
+    queryParams.offset = offset;
 
     const prewhereConditions = [
       'time_created BETWEEN {from_time: DateTime} AND {to_time: DateTime}',
@@ -55,24 +55,6 @@ export class QueryAlarmsRepository {
     }
     const prewhereClause = `PREWHERE ${prewhereConditions.join(' AND ')}`;
 
-    // Keyset pagination cursor constraint (goes to WHERE)
-    const whereConditions: string[] = [];
-    if (cursor_time && cursor_id) {
-      const cursorTimeStr = formatDate(cursor_time);
-      queryParams.cursor_time = cursorTimeStr;
-      queryParams.cursor_id = cursor_id;
-
-      if (sort_order === 'asc') {
-        whereConditions.push(
-          '(time_created > {cursor_time: DateTime} OR (time_created = {cursor_time: DateTime} AND alarm_id > {cursor_id: String}))',
-        );
-      } else {
-        whereConditions.push(
-          '(time_created < {cursor_time: DateTime} OR (time_created = {cursor_time: DateTime} AND alarm_id < {cursor_id: String}))',
-        );
-      }
-    }
-
     const sortFieldMap: Record<string, string> = {
       timestamp: 'time_created',
       severity: 'severity',
@@ -80,8 +62,6 @@ export class QueryAlarmsRepository {
     };
     const orderColumn = sortFieldMap[sort_by] || 'time_created';
     const orderDirection = sort_order === 'asc' ? 'ASC' : 'DESC';
-
-    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
     const dataQuery = `
       SELECT 
@@ -96,9 +76,8 @@ export class QueryAlarmsRepository {
         description
       FROM alarms
       ${prewhereClause}
-      ${whereClause}
       ORDER BY ${orderColumn} ${orderDirection}, alarm_id ${orderDirection}
-      LIMIT {limit: UInt32}
+      LIMIT {limit: UInt32} OFFSET {offset: UInt32}
     `;
 
     const countQuery = `

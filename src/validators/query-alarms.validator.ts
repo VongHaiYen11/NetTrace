@@ -7,8 +7,10 @@ const SORT_ORDER_WHITELIST = ['asc', 'desc'] as const;
 export const QueryAlarmsSchema = z.object({
   from_time: DateStringSchema.optional(),
   to_time: DateStringSchema.optional(),
-  cursor_time: DateStringSchema.optional(),
-  cursor_id: z.string().optional(),
+  offset: z.preprocess(
+    (val) => (val === undefined ? 0 : Number(val)),
+    z.number().int().min(0).default(0),
+  ),
   limit: z.preprocess(
     (val) => (val === undefined ? 100 : Number(val)),
     z.number().int().min(1).max(1000).default(100),
