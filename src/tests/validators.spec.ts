@@ -25,6 +25,13 @@ describe('Validation Layer Tests', () => {
       expect(result.to!.toISOString()).toBe('2026-06-12T00:00:00.000Z');
     });
 
+    it('should auto-expand date-only range to cover full day(s)', () => {
+      const result = validateTimeRange('2026-06-15', '2026-06-15');
+      expect(result.isValid).toBe(true);
+      expect(result.from!.toISOString()).toBe('2026-06-15T00:00:00.000Z');
+      expect(result.to!.toISOString()).toBe('2026-06-15T23:59:59.999Z');
+    });
+
     it('should reject when from_time is after to_time', () => {
       const result = validateTimeRange('2026-06-15T00:00:00Z', '2026-06-12T00:00:00Z');
       expect(result.isValid).toBe(false);

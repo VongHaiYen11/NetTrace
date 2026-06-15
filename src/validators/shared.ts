@@ -28,9 +28,22 @@ export const CommonAnalyticsFilterSchema = z.object({
 });
 
 export function validateTimeRange(fromStr?: string, toStr?: string) {
+  let finalFromStr = fromStr;
+  let finalToStr = toStr;
+
+  const dateOnlyRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+  // If input format is date-only (YYYY-MM-DD), auto-expand to start/end of day
+  if (fromStr && dateOnlyRegex.test(fromStr)) {
+    finalFromStr = `${fromStr}T00:00:00.000Z`;
+  }
+  if (toStr && dateOnlyRegex.test(toStr)) {
+    finalToStr = `${toStr}T23:59:59.999Z`;
+  }
+
   const now = new Date();
-  const to = toStr ? new Date(toStr) : now;
-  const from = fromStr ? new Date(fromStr) : new Date(to.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const to = finalToStr ? new Date(finalToStr) : now;
+  const from = finalFromStr ? new Date(finalFromStr) : new Date(to.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   if (from.getTime() > to.getTime()) {
     return {
