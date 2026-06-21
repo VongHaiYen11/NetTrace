@@ -1,22 +1,140 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { PenLine } from 'lucide-react';
-import { KpiGrid } from '../features/dashboard/components/KpiGrid';
-import { AnalyticsCharts, WeeklyAlarmChart } from '../features/dashboard/components/AnalyticsCharts';
-import { WeekdayHeatmap } from '../features/dashboard/components/WeekdayHeatmap';
-import { AlarmTable } from '../features/dashboard/components/AlarmTable';
 import { Button } from '../components/ui/Button';
-import { useDashboardData } from '../features/dashboard/hooks/useDashboardData';
-import type { CommonFilters, WeekdayHeatmapCell } from '../services/generated/nettrace-api';
+import { DashboardWidget } from '../features/dashboard/components/DashboardWidget';
+import {
+  WidgetSettingsDrawer,
+  type WidgetSettingsValues,
+} from '../features/dashboard/components/WidgetSettingsDrawer';
+
+type WidgetType =
+  | 'kpi-count'
+  | 'kpi-devices'
+  | 'kpi-status'
+  | 'chart-trend'
+  | 'chart-severity'
+  | 'chart-weekly'
+  | 'chart-heatmap'
+  | 'table-alarms';
+
+interface WidgetConfig extends WidgetSettingsValues {
+  id: string;
+  title: string;
+  type: WidgetType;
+}
 
 export function DashboardPage() {
-  const filters = useMemo<CommonFilters>(
-    () => ({
-      from_time: '2026-06-01',
-      to_time: '2026-06-30',
-    }),
-    [],
-  );
-  const data = useDashboardData(filters);
+  const [widgets, setWidgets] = useState<WidgetConfig[]>([
+    {
+      id: 'kpi-1',
+      type: 'kpi-count',
+      title: 'Số lượng cảnh báo',
+      chartType: 'line',
+      info1: true,
+      info2: true,
+      info3: false,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+    {
+      id: 'kpi-2',
+      type: 'kpi-devices',
+      title: 'Thiết bị bị ảnh hưởng',
+      chartType: 'bar',
+      info1: true,
+      info2: true,
+      info3: false,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+    {
+      id: 'kpi-3',
+      type: 'kpi-status',
+      title: 'Trạng thái hiện tại',
+      chartType: 'pie',
+      info1: true,
+      info2: true,
+      info3: false,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+    {
+      id: 'chart-1',
+      type: 'chart-trend',
+      title: 'Cảnh báo theo ngày',
+      chartType: 'line',
+      info1: true,
+      info2: true,
+      info3: false,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+    {
+      id: 'chart-2',
+      type: 'chart-severity',
+      title: 'Phân bố mức độ',
+      chartType: 'pie',
+      info1: true,
+      info2: true,
+      info3: false,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+    {
+      id: 'chart-3',
+      type: 'chart-weekly',
+      title: 'Cảnh báo (tuần này)',
+      chartType: 'bar',
+      info1: true,
+      info2: true,
+      info3: false,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+    {
+      id: 'chart-4',
+      type: 'chart-heatmap',
+      title: 'Bản đồ nhiệt',
+      chartType: 'heatmap',
+      info1: true,
+      info2: true,
+      info3: false,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+    {
+      id: 'table-1',
+      type: 'table-alarms',
+      title: 'Danh sách cảnh báo',
+      chartType: 'table',
+      info1: true,
+      info2: true,
+      info3: true,
+      preset: 'Active Connections',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+    },
+  ]);
+
+  const [activeWidgetId, setActiveWidgetId] = useState<string | null>(null);
+
+  const activeWidget = useMemo(() => {
+    return widgets.find((w) => w.id === activeWidgetId);
+  }, [widgets, activeWidgetId]);
+
+  function handleApplySettings(newValues: WidgetSettingsValues) {
+    if (!activeWidgetId) return;
+    setWidgets((prev) =>
+      prev.map((w) => (w.id === activeWidgetId ? { ...w, ...newValues } : w))
+    );
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-8 px-4 py-6 sm:px-6 lg:px-6">
@@ -32,43 +150,99 @@ export function DashboardPage() {
         </Button>
       </div>
 
-      <KpiGrid
-        data={data.summary.data?.data}
-        isLoading={data.summary.isLoading}
-        isError={data.summary.isError}
-      />
+      {/* KPI Cards Grid */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {widgets
+          .filter((w) => w.type.startsWith('kpi'))
+          .map((w) => (
+            <DashboardWidget
+              key={w.id}
+              id={w.id}
+              config={w}
+              onSettingsClick={() => setActiveWidgetId(w.id)}
+            />
+          ))}
+      </div>
 
-      <AnalyticsCharts
-        trend={data.trend.data?.data}
-        severity={data.severity.data?.data}
-        isTrendLoading={data.trend.isLoading}
-        isSeverityLoading={data.severity.isLoading}
-        isTrendError={data.trend.isError}
-        isSeverityError={data.severity.isError}
-      />
-
-      <section className="grid gap-6 xl:grid-cols-5">
+      {/* Daily Trend & Severity Charts */}
+      <div className="grid gap-6 xl:grid-cols-5">
+        <div className="xl:col-span-3">
+          {widgets
+            .filter((w) => w.id === 'chart-1')
+            .map((w) => (
+              <DashboardWidget
+                key={w.id}
+                id={w.id}
+                config={w}
+                onSettingsClick={() => setActiveWidgetId(w.id)}
+              />
+            ))}
+        </div>
         <div className="xl:col-span-2">
-          <WeeklyAlarmChart
-            trend={data.trend.data?.data}
-            isLoading={data.trend.isLoading}
-            isError={data.trend.isError}
-          />
+          {widgets
+            .filter((w) => w.id === 'chart-2')
+            .map((w) => (
+              <DashboardWidget
+                key={w.id}
+                id={w.id}
+                config={w}
+                onSettingsClick={() => setActiveWidgetId(w.id)}
+              />
+            ))}
+        </div>
+      </div>
+
+      {/* Weekly Trend & Heatmap Charts */}
+      <div className="grid gap-6 xl:grid-cols-5">
+        <div className="xl:col-span-2">
+          {widgets
+            .filter((w) => w.id === 'chart-3')
+            .map((w) => (
+              <DashboardWidget
+                key={w.id}
+                id={w.id}
+                config={w}
+                onSettingsClick={() => setActiveWidgetId(w.id)}
+              />
+            ))}
         </div>
         <div className="xl:col-span-3">
-          <WeekdayHeatmap
-            data={data.heatmap.data?.data as WeekdayHeatmapCell[] | undefined}
-            isLoading={data.heatmap.isLoading}
-            isError={data.heatmap.isError}
-          />
+          {widgets
+            .filter((w) => w.id === 'chart-4')
+            .map((w) => (
+              <DashboardWidget
+                key={w.id}
+                id={w.id}
+                config={w}
+                onSettingsClick={() => setActiveWidgetId(w.id)}
+              />
+            ))}
         </div>
-      </section>
+      </div>
 
-      <AlarmTable
-        data={data.alarms.data?.data}
-        isLoading={data.alarms.isLoading}
-        isError={data.alarms.isError}
-      />
+      {/* Alarms List Table */}
+      {widgets
+        .filter((w) => w.id === 'table-1')
+        .map((w) => (
+          <DashboardWidget
+            key={w.id}
+            id={w.id}
+            config={w}
+            onSettingsClick={() => setActiveWidgetId(w.id)}
+          />
+        ))}
+
+      {/* Settings Drawer */}
+      {activeWidget && (
+        <WidgetSettingsDrawer
+          isOpen={activeWidgetId !== null}
+          onClose={() => setActiveWidgetId(null)}
+          onApply={handleApplySettings}
+          initialValues={activeWidget}
+          widgetTitle={activeWidget.title}
+          widgetKind={activeWidget.type}
+        />
+      )}
     </div>
   );
 }

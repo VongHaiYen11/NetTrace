@@ -65,10 +65,25 @@ function rowLabel(row: AnalyticsRow) {
 
 function formatBucket(value: string) {
   try {
-    return format(parseISO(value), 'MMM d');
+    return format(parseISO(value.replace(' ', 'T')), 'dd/MM');
   } catch {
     return value;
   }
+}
+
+function getTimeBucketMs(row: AnalyticsRow) {
+  if (!row.time_bucket) return Number.POSITIVE_INFINITY;
+  const parsed = Date.parse(String(row.time_bucket).replace(' ', 'T'));
+  return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
+}
+
+function getSortedTrendRows(rows: AnalyticsRow[]) {
+  return [...rows].sort((a, b) => {
+    const aTime = getTimeBucketMs(a);
+    const bTime = getTimeBucketMs(b);
+    if (aTime !== bTime) return aTime - bTime;
+    return String(a.time_bucket ?? a.label ?? '').localeCompare(String(b.time_bucket ?? b.label ?? ''));
+  });
 }
 
 export function AnalyticsCharts({
@@ -79,7 +94,7 @@ export function AnalyticsCharts({
   isTrendError,
   isSeverityError,
 }: AnalyticsChartsProps) {
-  const trendData = (trend ?? []).map((row) => ({
+  const trendData = getSortedTrendRows(trend ?? []).map((row) => ({
     name: rowLabel(row),
     value: row.value,
   }));
@@ -171,7 +186,7 @@ interface WeeklyAlarmChartProps {
 }
 
 export function WeeklyAlarmChart({ trend, isLoading, isError }: WeeklyAlarmChartProps) {
-  const weeklyData = (trend ?? []).slice(-7).map((row) => ({
+  const weeklyData = getSortedTrendRows(trend ?? []).slice(-7).map((row) => ({
     name: rowLabel(row).slice(0, 3).toUpperCase(),
     value: row.value,
   }));
