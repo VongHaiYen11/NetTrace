@@ -2,10 +2,14 @@
   "name": "nettrace-monorepo",
   "private": true,
   "workspaces": [
-    "backend"
+    "backend",
+    "frontend"
   ],
   "scripts": {
     "dev": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build:frontend": "npm run build -w frontend",
+    "preview:frontend": "npm run preview -w frontend",
     "build": "npm run build -w backend",
     "start": "npm run start -w backend",
     "db:check": "npm run db:check -w backend",

@@ -1,0 +1,41 @@
+{
+  "name": "nettrace-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.80.10",
+    "@tanstack/react-table": "^8.21.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "echarts": "^6.1.0",
+    "echarts-for-react": "^3.0.6",
+    "lodash-es": "^4.17.21",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.58.1",
+    "react-router-dom": "^7.6.2",
+    "recharts": "^2.15.3",
+    "sonner": "^1.7.4",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^20.19.1",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.6.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.19"
+  }
+}
