@@ -43,11 +43,12 @@ nettrace/
 
 The backend follows a **Clean Layered Architecture** with strict down-stream dependencies:
 
-1. **Route Layer:** Standard Express routers mapping paths to controllers, registering schemas, and exposing OpenAPI specifications.
-2. **Controller Layer:** Parses requests from Zod validators, calls service functions, handles response packaging, and returns status.
-3. **Service Layer:** Implements business logic, performs in-memory data aggregation/stitching (Data Federation) using hash maps.
-4. **Repository Layer:** Generates optimized SQL queries for ClickHouse and PostgreSQL.
-5. **Database Layer:** Singleton ClickHouse connection and PostgreSQL pooled connection manager.
+1. **Controller Layer:** Parses requests from Zod validators, calls service functions, handles response packaging, and returns status.
+2. **Service Layer:** Implements business logic, performs in-memory data aggregation/stitching (Data Federation) using hash maps.
+3. **Repository Layer:** Generates optimized SQL queries for ClickHouse and PostgreSQL.
+4. **Database Layer:** Singleton ClickHouse connection and PostgreSQL pooled connection manager.
+
+Express route modules are HTTP adapters for endpoint mapping, middleware registration, and OpenAPI annotations. They are not treated as a standalone business layer.
 
 ### Technical Stack & Key Conventions
 * **TypeScript ESM:** Built with TypeScript using ESM (`"type": "module"`). Import statements must specify the file extensions (e.g. `import foo from './foo.js'`).

@@ -38,19 +38,20 @@ The system is designed following a strict one-way layered model (Clean Layered A
 
 ```mermaid
 graph TD
-    Request --> Route
-    Route --> Controller
+    Request --> HTTPAdapter[HTTP Adapter]
+    HTTPAdapter --> Controller
     Controller --> Service
     Service --> Repository
     Repository --> Database
 ```
 
 ### 🏢 Layer Responsibilities
-1. **Route Layer:** Routes HTTP endpoints, registers middlewares (logging, validator). *Does not contain business logic.*
-2. **Controller Layer:** Parses request, retrieves validated parameters, invokes Service layer and returns HTTP Response. *Does not contain business logic.*
-3. **Service Layer:** Processes business logic, aggregation logic, coordinates **Data Federation** and maps output payloads.
-4. **Repository Layer:** Constructs specific ClickHouse/PostgreSQL SQL queries. *Does not contain business logic.*
-5. **Database Layer:** Manages connection pools, retry policies, and timeout settings.
+1. **Controller Layer:** Parses request, retrieves validated parameters, invokes Service layer and returns HTTP Response. *Does not contain business logic.*
+2. **Service Layer:** Processes business logic, aggregation logic, coordinates **Data Federation** and maps output payloads.
+3. **Repository Layer:** Constructs specific ClickHouse/PostgreSQL SQL queries. *Does not contain business logic.*
+4. **Database Layer:** Manages connection pools, retry policies, and timeout settings.
+
+Express route modules act as HTTP adapters for endpoint mapping, middleware registration, and OpenAPI annotations. They are not treated as a standalone business layer.
 
 ---
 

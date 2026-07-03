@@ -68,16 +68,17 @@ Swagger UI is mounted at `/api-docs` when the server is running.
 ## Architecture
 
 ```text
-Route → Controller → Service → Repository → Database
+HTTP Adapter → Controller → Service → Repository → Database
 ```
 
 | Layer | Responsibility |
 | --- | --- |
-| Routes | Express paths, Swagger annotations, Zod middleware |
 | Controllers | Read validated `res.locals`, call services, return response envelopes |
 | Services | Business logic, federation, transactions, normalization, guardrails |
 | Repositories | Raw parameterized PostgreSQL SQL and ClickHouse query construction |
 | Database | PostgreSQL pool and ClickHouse singleton client |
+
+Express route modules are HTTP adapters for endpoint mapping, Swagger annotations, and Zod middleware registration; they are not counted as a separate backend layer.
 
 ## Data Model
 
