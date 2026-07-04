@@ -25,7 +25,7 @@ import { StateBlock } from '../../../components/shared/StateBlock';
 import { nettraceApi } from '../../../services/generated/nettrace-api';
 import { cn } from '../../../utils/cn';
 import { DEFAULT_TABLE_COLUMNS, alarmColumnLabels } from '../../../constants/alarmColumns';
-import { groupSmallPieSlices } from '../utils/pieData';
+import { groupSmallPieSlices, limitBarCategories } from '../utils/pieData';
 import type {
   AnalyticsRow,
   Alarm,
@@ -614,14 +614,17 @@ export function DashboardWidget({ id, config, layoutContext, onSettingsClick }: 
         : getRowGroupLabel(row, config.groupBy),
       value: row.value,
     }));
+    const chartData = config.chartType === 'bar'
+      ? limitBarCategories(trendData, config.groupBy !== 'none' && config.groupBy !== 'status' && config.groupBy !== 'severity')
+      : trendData;
 
-    if (trendData.length === 0) {
+    if (chartData.length === 0) {
       renderContent = <StateBlock title="No data" description="Try another filter or time range." />;
     } else if (config.chartType === 'line') {
       renderContent = (
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={trendData} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
               <defs>
                 <linearGradient id={`volume-${id}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#ff2d85" stopOpacity={0.36} />
@@ -647,7 +650,7 @@ export function DashboardWidget({ id, config, layoutContext, onSettingsClick }: 
       renderContent = (
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={trendData} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
               {config.info1 && <CartesianGrid stroke="var(--chart-grid)" vertical={false} />}
               <XAxis dataKey="name" tickLine={false} axisLine={false} />
               <YAxis tickLine={false} axisLine={false} width={44} tickFormatter={formatNumberWithSuffix} />
@@ -658,8 +661,8 @@ export function DashboardWidget({ id, config, layoutContext, onSettingsClick }: 
                 />
               )}
               <Bar dataKey="value" fill="#0f766e" radius={[3, 3, 0, 0]}>
-                {trendData.map((entry, index) => (
-                  <Cell key={entry.name} fill={config.groupBy === 'none' && index === trendData.length - 2 ? '#ff2d85' : '#0f766e'} />
+                {chartData.map((entry, index) => (
+                  <Cell key={entry.name} fill={config.groupBy === 'none' && index === chartData.length - 2 ? '#ff2d85' : '#0f766e'} />
                 ))}
               </Bar>
             </BarChart>

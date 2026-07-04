@@ -739,7 +739,7 @@ function applyPresetToWidget(
     tableColumns: normalizeTableColumns(preset.table_columns),
     tablePageSize: preset.table_page_size ?? widget.tablePageSize ?? widget.tableRecordLimit ?? DEFAULT_TABLE_RECORD_LIMIT,
     tableRecordLimit: preset.table_record_limit ?? widget.tableRecordLimit ?? DEFAULT_TABLE_TOTAL_RECORDS,
-    layoutSpan: chartType === 'table' || chartType === 'heatmap' ? 2 : 1,
+    layoutSpan: widget.layoutSpan ?? (chartType === 'table' || chartType === 'heatmap' ? 2 : 1),
     startDate: widget.startDate,
     endDate: widget.endDate,
   };
@@ -772,7 +772,7 @@ function applyTemplateWidgetsFromDb(
       tableColumns: normalizeTableColumns(templateWidget.preset.table_columns),
       tablePageSize: templateWidget.preset.table_page_size ?? slot.tablePageSize ?? slot.tableRecordLimit ?? DEFAULT_TABLE_RECORD_LIMIT,
       tableRecordLimit: templateWidget.preset.table_record_limit ?? slot.tableRecordLimit ?? DEFAULT_TABLE_TOTAL_RECORDS,
-      layoutSpan: chartType === 'table' || chartType === 'heatmap' ? 2 : 1,
+      layoutSpan: slot.layoutSpan ?? (chartType === 'table' || chartType === 'heatmap' ? 2 : 1),
       startDate: normalizeTemplateDate(templateWidget.start_date, slot.startDate || ''),
       endDate: normalizeTemplateDate(templateWidget.end_date, slot.endDate || ''),
     });

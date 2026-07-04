@@ -4,14 +4,7 @@
 > 
 NetTrace is a Network Operations Center (NOC) analytics platform for exploring high-volume alarm events, monitoring operational KPIs, configuring dashboard templates, and exporting filtered incident data. 
 
-![Project Status](https://img.shields.io/badge/status-active_development-2ea44f?style=for-the-badge)
-![TypeScript](https://img.shields.io/badge/TypeScript-placeholder-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-placeholder-61DAFB?style=for-the-badge&logo=react&logoColor=111111)
-![Express](https://img.shields.io/badge/Express-placeholder-000000?style=for-the-badge&logo=express&logoColor=white)
-![ClickHouse](https://img.shields.io/badge/ClickHouse-placeholder-FFCC01?style=for-the-badge&logo=clickhouse&logoColor=111111)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-placeholder-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-
-> The frontend and backend are maintained in separate repositories; this repository is the central documentation and project overview hub.
+> The frontend and backend are maintained in separate repositories, this repository is the central documentation and project overview hub.
 
 ---
 

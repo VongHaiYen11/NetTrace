@@ -21,6 +21,7 @@ import {
 import { nettraceApi } from '../services/generated/nettrace-api';
 import { decodeTableColumns } from '../utils/columns';
 import type { AppOutletContext } from '../layouts/AppLayout';
+import type { TemplateDetail } from '../services/generated/nettrace-api';
 
 type WidgetType =
   | 'kpi-count'
@@ -46,6 +47,12 @@ interface WidgetConfig extends WidgetSettingsValues {
 }
 
 type TableHeightMode = 'paired' | 'middle' | 'roomy';
+
+function getActiveTemplateId(template: { id: string; name: string } | null) {
+  if (!template?.id.startsWith('db:')) return null;
+  const templateId = Number(template.id.replace('db:', ''));
+  return Number.isFinite(templateId) ? templateId : null;
+}
 
 export function DashboardPage() {
   const queryClient = useQueryClient();
@@ -124,6 +131,54 @@ function getCurrentWeekRange() {
   };
 }
 
+  function getSnapshotWidgets(template: TemplateDetail) {
+    try {
+      const parsed = JSON.parse(template.selected_cards || '') as { widgets?: WidgetConfig[] };
+      return Array.isArray(parsed.widgets) ? parsed.widgets : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function applyTemplateDetail(currentWidgets: WidgetConfig[], template: TemplateDetail) {
+    const baseWidgets = getSnapshotWidgets(template) ?? currentWidgets;
+    const orderedTemplateWidgets = [...template.widgets].sort(
+      (a, b) => a.position - b.position || a.widget_id - b.widget_id,
+    );
+    const chartSlots = baseWidgets
+      .filter((widget) => !widget.type.startsWith('kpi'))
+      .sort((a, b) => a.layoutOrder - b.layoutOrder);
+    const updatesById = new Map<string, Partial<WidgetConfig>>();
+
+    orderedTemplateWidgets.slice(0, chartSlots.length).forEach((templateWidget, index) => {
+      const slot = chartSlots[index];
+      const chartType = normalizePresetChartType(templateWidget.preset.chart_type);
+      updatesById.set(slot.id, {
+        title: templateWidget.preset.preset_name || `Preset ${templateWidget.preset.preset_id}`,
+        preset: `preset:${templateWidget.preset.preset_id}`,
+        visible: true,
+        layoutOrder: templateWidget.position || index + 1,
+        chartType,
+        groupBy: normalizePresetGroupBy(templateWidget.preset.group_by) as WidgetConfig['groupBy'],
+        metric: normalizePresetMetric(templateWidget.preset.metric) as WidgetConfig['metric'],
+        timeBucket: normalizePresetTimeBucket(templateWidget.preset.time_bucket) as WidgetConfig['timeBucket'],
+        heatmapMode: normalizePresetHeatmapMode(templateWidget.preset.heatmap_mode) as WidgetConfig['heatmapMode'],
+        tableColumns: normalizePresetTableColumns(templateWidget.preset.table_columns),
+        tablePageSize: templateWidget.preset.table_page_size ?? slot.tablePageSize,
+        tableRecordLimit: templateWidget.preset.table_record_limit ?? slot.tableRecordLimit,
+        layoutSpan: slot.layoutSpan ?? (chartType === 'table' || chartType === 'heatmap' ? 2 : 1),
+        startDate: templateWidget.start_date ?? slot.startDate,
+        endDate: templateWidget.end_date ?? slot.endDate,
+      });
+    });
+
+    return baseWidgets.map((widget) => {
+      if (widget.type.startsWith('kpi')) return widget;
+      const patch = updatesById.get(widget.id);
+      return patch ? { ...widget, ...patch } : { ...widget, visible: false };
+    });
+  }
+
   const widgetPresets = useQuery({
     queryKey: ['dashboard-widget-presets'],
     queryFn: async () => {
@@ -165,6 +220,37 @@ function getCurrentWeekRange() {
     refetchOnWindowFocus: true,
     refetchInterval: activeTemplate ? 10_000 : false,
   });
+
+  useEffect(() => {
+    void queryClient.invalidateQueries({ queryKey: ['dashboard-widget-presets'] });
+    void queryClient.invalidateQueries({ queryKey: ['summary'] });
+    void queryClient.invalidateQueries({ queryKey: ['analytics-widget'] });
+    void queryClient.invalidateQueries({ queryKey: ['heatmap'] });
+    void queryClient.invalidateQueries({ queryKey: ['alarms'] });
+
+    const templateId = getActiveTemplateId(activeTemplate);
+    if (!templateId) return;
+
+    let isCancelled = false;
+    void nettraceApi.getTemplateDetail(templateId)
+      .then((response) => {
+        if (isCancelled) return;
+        setActiveTemplate({ id: `db:${response.data.template_id}`, name: response.data.name });
+        setWidgets((current) => applyTemplateDetail(current as WidgetConfig[], response.data));
+      })
+      .catch(() => {
+        if (isCancelled) return;
+        setActiveTemplate(null);
+        setWidgets([]);
+        setActiveWidgetId(null);
+        setGeneralSettingsOpen(false);
+        toast.info('The selected template no longer exists.');
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeTemplate?.id, queryClient, setActiveTemplate, setWidgets]);
 
   useEffect(() => {
     if (!activeTemplate || !widgetPresets.data) return;
