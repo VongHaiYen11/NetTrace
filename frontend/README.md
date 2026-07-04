@@ -151,6 +151,7 @@ The implemented flow supports:
 - Do not invent endpoint paths, request fields, or response fields in UI code.
 - Invalidate TanStack Query caches after mutations that affect templates or presets.
 - `VITE_API_BASE_URL` is the only frontend API base URL switch.
+- If `VITE_API_BASE_URL` points to a different origin, that frontend origin must be listed in the backend `CORS_ORIGINS` setting.
 
 ## Design Notes
 

@@ -25,6 +25,24 @@ npm run dev
 
 Swagger UI is mounted at `/api-docs` when the server is running.
 
+## Environment
+
+Copy `.env.example` to `.env` and set the database connection values for the target environment.
+
+`CORS_ORIGINS` controls which browser origins may call the API. Use a comma-separated list:
+
+```env
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+For production deployments where the frontend is hosted separately from the API, set it to the deployed frontend origin:
+
+```env
+CORS_ORIGINS=https://your-frontend-domain.com
+```
+
+Requests without a browser `Origin` header, such as curl or server-to-server checks, are still allowed.
+
 ## Scripts
 
 | Command | Purpose |
