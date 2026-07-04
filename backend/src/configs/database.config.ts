@@ -3,9 +3,18 @@ import dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
+const parseCsvEnv = (value: string | undefined): string[] =>
+  (value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+
 export const config = {
   port: parseInt(process.env.PORT || '3000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
+  cors: {
+    allowedOrigins: parseCsvEnv(process.env.CORS_ORIGINS),
+  },
   postgres: {
     host: process.env.PG_HOST || 'localhost',
     port: parseInt(process.env.PG_PORT || '5432', 10),
