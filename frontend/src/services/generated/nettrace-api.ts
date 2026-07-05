@@ -1,5 +1,5 @@
 export type Severity = 'critical' | 'major' | 'minor' | 'warning' | 'info' | string;
-export type AlarmStatus = 'active' | 'closed' | string;
+export type AlarmStatus = 'active' | 'archived' | string;
 export type SortBy = 'timestamp' | 'severity' | 'status';
 export type SortOrder = 'asc' | 'desc';
 export type AlarmSearchField =
@@ -137,7 +137,7 @@ export interface QueryAlarmsParams extends CommonFilters {
 export interface SummaryResult {
   totalAlarms: number;
   activeAlarms: number;
-  closedAlarms: number;
+  archivedAlarms: number;
   criticalAlarms: number;
   affectedDevices: number;
 }

@@ -16,9 +16,9 @@ const cards = [
     label: 'Alarm count',
     icon: RadioTower,
     subtitle: (data: SummaryResult) =>
-      `${data.activeAlarms.toLocaleString('vi-VN')} active · ${data.closedAlarms.toLocaleString(
+      `${data.activeAlarms.toLocaleString('vi-VN')} active · ${data.archivedAlarms.toLocaleString(
         'vi-VN',
-      )} closed`,
+      )} archived`,
   },
   {
     key: 'affectedDevices',

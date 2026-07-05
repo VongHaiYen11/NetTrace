@@ -66,7 +66,7 @@ const SEVERITY_OPTIONS = [
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
-  { value: 'closed', label: 'Closed' },
+  { value: 'archived', label: 'Archived' },
 ];
 
 const FORMAT_EXTENSION: Record<ExportFormat, string> = {

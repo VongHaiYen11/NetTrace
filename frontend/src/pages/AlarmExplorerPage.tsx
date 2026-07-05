@@ -519,7 +519,7 @@ export function AlarmExplorerPage() {
                           <Select value={status} onChange={(event) => { setStatus(event.target.value); resetPaging(); }}>
                             <option value="">Any status</option>
                             <option value="active">Active</option>
-                            <option value="closed">Closed</option>
+                            <option value="archived">Archived</option>
                           </Select>
                         </Field>
                         <Field label="Device ID" labelVariant="nested">

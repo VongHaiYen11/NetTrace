@@ -351,7 +351,7 @@ function renderAlarmTableCell(alarm: Alarm, column: ExportColumn) {
   if (column === 'status') {
     return (
       <Badge tone={alarm.status.toLowerCase() === 'active' ? 'amber' : 'green'}>
-        {alarm.status.toLowerCase() === 'active' ? 'Active' : 'Closed'}
+        {alarm.status.toLowerCase() === 'active' ? 'Active' : 'Archived'}
       </Badge>
     );
   }
@@ -528,13 +528,13 @@ export function DashboardWidget({ id, config, layoutContext, onSettingsClick }: 
     const alarmHealthTone = getKpiStatusTone(data.criticalAlarms / totalAlarms);
     const totalTone = alarmHealthTone;
     const activeTone = alarmHealthTone;
-    const closedTone = getKpiStatusTone(data.closedAlarms / totalAlarms, true);
+    const archivedTone = getKpiStatusTone(data.archivedAlarms / totalAlarms, true);
     const criticalTone = getKpiStatusTone(data.criticalAlarms / totalAlarms);
     const deviceTone = getKpiStatusTone(0);
     const kpiConfig = {
       'kpi-total': {
         value: data.totalAlarms.toLocaleString('vi-VN'),
-        subtitle: `${data.activeAlarms.toLocaleString('vi-VN')} active · ${data.closedAlarms.toLocaleString('vi-VN')} closed`,
+        subtitle: `${data.activeAlarms.toLocaleString('vi-VN')} active · ${data.archivedAlarms.toLocaleString('vi-VN')} archived`,
         ...totalTone,
         Icon: RadioTower,
       },
@@ -545,9 +545,9 @@ export function DashboardWidget({ id, config, layoutContext, onSettingsClick }: 
         Icon: RadioTower,
       },
       'kpi-closed': {
-        value: data.closedAlarms.toLocaleString('vi-VN'),
-        subtitle: `${data.closedAlarms.toLocaleString('vi-VN')} closed alarms`,
-        ...closedTone,
+        value: data.archivedAlarms.toLocaleString('vi-VN'),
+        subtitle: `${data.archivedAlarms.toLocaleString('vi-VN')} archived alarms`,
+        ...archivedTone,
         Icon: MoreHorizontal,
       },
       'kpi-devices': {

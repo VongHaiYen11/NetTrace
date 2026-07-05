@@ -411,7 +411,7 @@ router.get('/alarms', validateQuery(QueryAlarmsSchema), queryAlarmsController.qu
  * /api/v1/analytics/summary:
  *   get:
  *     summary: Retrieve operational summary KPIs
- *     description: Returns overall count aggregates for critical cards (total, active, closed, critical, affected devices).
+ *     description: Returns overall count aggregates for critical cards (total, active, archived, critical, affected devices).
  *     tags:
  *       - Analytics
  *     parameters:
@@ -475,7 +475,7 @@ router.get('/alarms', validateQuery(QueryAlarmsSchema), queryAlarmsController.qu
  *                     activeAlarms:
  *                       type: integer
  *                       example: 120
- *                     closedAlarms:
+ *                     archivedAlarms:
  *                       type: integer
  *                       example: 5280
  *                     criticalAlarms:

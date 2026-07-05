@@ -61,7 +61,7 @@ describe('Functional API tests', () => {
       summary: {
         totalAlarms: 10,
         activeAlarms: 4,
-        closedAlarms: 6,
+        archivedAlarms: 6,
         criticalAlarms: 2,
         affectedDevices: 0,
       },
@@ -281,7 +281,7 @@ describe('Functional API tests', () => {
       expect(response.body.data).toEqual({
         totalAlarms: 10,
         activeAlarms: 4,
-        closedAlarms: 6,
+        archivedAlarms: 6,
         criticalAlarms: 2,
         affectedDevices: 2,
       });

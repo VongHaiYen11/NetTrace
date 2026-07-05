@@ -221,7 +221,7 @@ describe('Service Layer Tests', () => {
         summary: {
           totalAlarms: 100,
           activeAlarms: 10,
-          closedAlarms: 90,
+          archivedAlarms: 90,
           criticalAlarms: 5,
           affectedDevices: 3,
         },
@@ -529,7 +529,7 @@ describe('Service Layer Tests', () => {
               alarm_id: 'a2',
               device_id: 'DEV01',
               error_code: 'ERR02',
-              status: 'closed',
+              status: 'archived',
             }) + '\n',
           );
           this.push(null);

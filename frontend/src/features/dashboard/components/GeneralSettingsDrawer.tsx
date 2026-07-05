@@ -101,9 +101,9 @@ const summaryOptions = [
   {
     key: 'kpi-closed',
     icon: Check,
-    title: 'Closed alarms',
-    fields: ['closedAlarms'],
-    description: 'Shows closed alarms.',
+    title: 'Archived alarms',
+    fields: ['archivedAlarms'],
+    description: 'Shows archived alarms.',
   },
   {
     key: 'kpi-devices',

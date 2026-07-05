@@ -9,7 +9,7 @@ All endpoints are mounted under `/api/v1`.
 | Domain | Endpoint | Purpose |
 | --- | --- | --- |
 | Alarm details | `GET /alarms` | Paginated alarm records with ClickHouse filters and PostgreSQL metadata enrichment |
-| Summary KPIs | `GET /analytics/summary` | Total, active, closed, critical, and affected-device counts |
+| Summary KPIs | `GET /analytics/summary` | Total, active, archived, critical, and affected-device counts |
 | Analytics query | `POST /analytics/query` | Generic aggregation for line, bar, pie, top-N, and grouped charts |
 | Heatmap | `POST /analytics/heatmap` | Weekday/hour or calendar-style alarm density |
 | Metadata options | `GET /metadata/options` | Searchable device type, vendor, station, and province values |
@@ -192,7 +192,7 @@ Returns KPI aggregates:
 
 - `totalAlarms`
 - `activeAlarms`
-- `closedAlarms`
+- `archivedAlarms`
 - `criticalAlarms`
 - `affectedDevices`
 

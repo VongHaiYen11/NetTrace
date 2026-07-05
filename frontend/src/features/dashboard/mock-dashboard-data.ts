@@ -8,7 +8,7 @@ import type {
 export const mockSummary: SummaryResult = {
   totalAlarms: 14293,
   activeAlarms: 3,
-  closedAlarms: 14290,
+  archivedAlarms: 14290,
   criticalAlarms: 3,
   affectedDevices: 892.4,
 };
@@ -94,7 +94,7 @@ export const mockAlarms: Alarm[] = [
     device_id: 'SYNC-HN-02',
     time_created: '2026-06-22T10:38:12.000Z',
     time_solved: '2026-06-22T10:38:20.000Z',
-    status: 'closed',
+    status: 'archived',
     severity: 'info',
     description: 'Data sync complete',
   },
@@ -111,7 +111,7 @@ export const mockAlarms: Alarm[] = [
     device_id: 'CORE-HN-01',
     time_created: '2026-06-22T10:15:00.000Z',
     time_solved: '2026-06-22T10:16:00.000Z',
-    status: 'closed',
+    status: 'archived',
     severity: 'info',
     description: 'System update deployed',
   },

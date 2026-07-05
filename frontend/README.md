@@ -99,7 +99,7 @@ The dashboard loads reusable configuration through:
 
 The implemented dashboard supports:
 
-1. KPI widgets for total alarms, active alarms, closed alarms, critical alarms, and affected devices. KPI widgets call `GET /api/v1/analytics/summary`.
+1. KPI widgets for total alarms, active alarms, archived alarms, critical alarms, and affected devices. KPI widgets call `GET /api/v1/analytics/summary`.
 2. Line, bar, and pie chart widgets. These widgets call `POST /api/v1/analytics/query`.
 3. Table widgets for alarm rows. These widgets call `GET /api/v1/alarms`.
 4. Heatmap widgets in weekday or calendar mode. These widgets call `POST /api/v1/analytics/heatmap`.

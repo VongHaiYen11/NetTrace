@@ -87,7 +87,7 @@ export function DashboardFilters({ values, onApply }: DashboardFiltersProps) {
             <Select {...register('status')}>
               <option value="">All</option>
               <option value="active">Active</option>
-              <option value="archived">Closed</option>
+              <option value="archived">Archived</option>
             </Select>
           </Field>
           <Field label="Device ID" hint="Comma-separated">

@@ -270,7 +270,7 @@ export function WidgetSettingsDrawer({
       { name: 'info1', label: 'Show active alarm note', checked: info1 },
     ],
     'kpi-closed': [
-      { name: 'info1', label: 'Show closed alarm note', checked: info1 },
+      { name: 'info1', label: 'Show archived alarm note', checked: info1 },
     ],
     'kpi-devices': [
       { name: 'info1', label: 'Show unique-device note', checked: info1 },

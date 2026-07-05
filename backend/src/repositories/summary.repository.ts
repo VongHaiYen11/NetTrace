@@ -13,7 +13,7 @@ export interface SummaryParams {
 export interface SummaryResult {
   totalAlarms: number;
   activeAlarms: number;
-  closedAlarms: number;
+  archivedAlarms: number;
   criticalAlarms: number;
   affectedDevices: number;
 }
@@ -53,7 +53,7 @@ export class SummaryRepository {
       SELECT
         count() as total_alarms,
         countIf(lower(status) = 'active') as active_alarms,
-        countIf(lower(status) = 'archived') as closed_alarms,
+        countIf(lower(status) = 'archived') as archived_alarms,
         countIf(lower(severity) = 'critical') as critical_alarms,
         uniqExact(device_id) as affected_devices,
         groupUniqArray(device_id) as affected_device_ids
@@ -64,7 +64,7 @@ export class SummaryRepository {
     const { rows, durationMs } = await executeClickhouseQuery<{
       total_alarms: string;
       active_alarms: string;
-      closed_alarms: string;
+      archived_alarms: string;
       critical_alarms: string;
       affected_devices: string;
       affected_device_ids: string[] | string;
@@ -73,7 +73,7 @@ export class SummaryRepository {
     const summary: SummaryResult = {
       totalAlarms: 0,
       activeAlarms: 0,
-      closedAlarms: 0,
+      archivedAlarms: 0,
       criticalAlarms: 0,
       affectedDevices: 0,
     };
@@ -82,7 +82,7 @@ export class SummaryRepository {
       const row = rows[0];
       summary.totalAlarms = parseInt(row.total_alarms, 10);
       summary.activeAlarms = parseInt(row.active_alarms, 10);
-      summary.closedAlarms = parseInt(row.closed_alarms, 10);
+      summary.archivedAlarms = parseInt(row.archived_alarms, 10);
       summary.criticalAlarms = parseInt(row.critical_alarms, 10);
       summary.affectedDevices = parseInt(row.affected_devices, 10);
     }

@@ -47,7 +47,7 @@ export class SummaryService {
         return {
           totalAlarms: 0,
           activeAlarms: 0,
-          closedAlarms: 0,
+          archivedAlarms: 0,
           criticalAlarms: 0,
           affectedDevices: 0,
         };
@@ -61,7 +61,7 @@ export class SummaryService {
           return {
             totalAlarms: 0,
             activeAlarms: 0,
-            closedAlarms: 0,
+            archivedAlarms: 0,
             criticalAlarms: 0,
             affectedDevices: 0,
           };
@@ -92,7 +92,7 @@ export class SummaryService {
         metrics.clickhouse_query_time_ms += result.durationMs;
         acc.totalAlarms += result.summary.totalAlarms;
         acc.activeAlarms += result.summary.activeAlarms;
-        acc.closedAlarms += result.summary.closedAlarms;
+        acc.archivedAlarms += result.summary.archivedAlarms;
         acc.criticalAlarms += result.summary.criticalAlarms;
         result.affectedDeviceIds.forEach((deviceId) => affectedDeviceIds.add(deviceId));
         return acc;
@@ -100,7 +100,7 @@ export class SummaryService {
       {
         totalAlarms: 0,
         activeAlarms: 0,
-        closedAlarms: 0,
+        archivedAlarms: 0,
         criticalAlarms: 0,
         affectedDevices: 0,
       },

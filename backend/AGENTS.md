@@ -349,13 +349,13 @@ Cung cấp dữ liệu phục vụ phân tích, thống kê, và truy vấn thô
 
 #### 1.2. Summary API
 * **Endpoint:** `GET /api/v1/analytics/summary`
-* **Purpose:** Provides statistics on total alerts, active/closed alert counts, critical alert counts, and the number of unique affected devices for Dashboard KPI cards.
+* **Purpose:** Provides statistics on total alerts, active/archived alert counts, critical alert counts, and the number of unique affected devices for Dashboard KPI cards.
 * **Supported Filters:**
   * Common Analytics Filter Contract (including time filters, severity, device, vendor...)
 * **Response Shape (HTTP 200):** Returns a JSON object with camelCase properties inside the `data` field:
   * `totalAlarms`: Total number of alarms.
   * `activeAlarms`: Number of active alarms (`status` is `active` or `ACTIVE`).
-  * `closedAlarms`: Number of closed alarms (`status` is `closed`, `solved`, `CLOSED`, or `SOLVED`).
+  * `archivedAlarms`: Number of archived alarms (`status` is `archived`).
   * `criticalAlarms`: Number of alarms with severity `critical` or `CRITICAL`.
   * `affectedDevices`: Number of unique devices affected (`uniqExact(device_id)`).
 
