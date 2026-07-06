@@ -1,6 +1,6 @@
 <div align="center">
 
-# NetTrace Frontend
+# 🖥️ NetTrace Frontend
 
 React/Vite dashboard application for NetTrace NOC analytics.
 
@@ -9,12 +9,13 @@ React/Vite dashboard application for NetTrace NOC analytics.
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 </div>
 
 The frontend consumes the backend `/api/v1` contract through `src/services/generated/nettrace-api.ts`. It renders the dashboard, Alarm Explorer, export workflow, and Templates & Presets management screens.
 
-## Quick Start
+## ⚡ Quick Start
 
 ```bash
 npm install
@@ -27,7 +28,7 @@ The dev server binds to `127.0.0.1`. When the backend is not served from the sam
 VITE_API_BASE_URL=http://localhost:3000 npm run dev
 ```
 
-## Scripts
+## 📜 Scripts
 
 | Command | Purpose |
 | --- | --- |
@@ -35,7 +36,7 @@ VITE_API_BASE_URL=http://localhost:3000 npm run dev
 | `npm run build` | Type-check and build production assets |
 | `npm run preview` | Preview the production build locally |
 
-## Stack
+## 🛠️ Stack
 
 | Area | Libraries |
 | --- | --- |
@@ -47,7 +48,7 @@ VITE_API_BASE_URL=http://localhost:3000 npm run dev
 | Charts | Recharts, ECharts |
 | UI feedback | Lucide React, Sonner |
 
-## Source Layout
+## 📁 Source Layout
 
 ```text
 src/
@@ -61,7 +62,7 @@ src/
 └── utils/               # shared helpers such as column and preset payload encoding
 ```
 
-## Main Screens
+## 📺 Main Screens
 
 | Screen | What It Does |
 | --- | --- |
@@ -70,9 +71,9 @@ src/
 | Export | Filtered CSV/XLSX/JSON export with selected columns |
 | Templates | Template CRUD, reusable preset CRUD, widget/KPI count filters |
 
-## Implemented Feature Flows
+## ✨ Implemented Feature Flows
 
-### 5.1. Alarm Management
+### 🚨 5.1. Alarm Management
 
 The **Alarm Explorer** screen lets users inspect and analyze alarm records from `/alarms`. The page builds `QueryAlarmsParams` from the active UI state and calls `GET /api/v1/alarms`.
 
@@ -88,7 +89,7 @@ The implemented flow supports:
 
 When filters, search, sort, columns, page, or page size change, TanStack Query refetches `GET /api/v1/alarms` with the updated query parameters.
 
-### 5.2. Dashboard Analytics
+### 📊 5.2. Dashboard Analytics
 
 The **Dashboard** screen provides a customizable analytics view for alarm monitoring. The page is template-backed: if no template is active, it shows a no-template state. When a template is selected, `DashboardPage` stores it in the shared `AppLayout` outlet context and renders the widgets saved in that template.
 
@@ -109,7 +110,7 @@ The implemented dashboard supports:
 
 When the user changes widget settings, the widget query key changes and TanStack Query refetches the matching API. When the user saves changes on an active template, the frontend calls `PUT /api/v1/templates/:id` and updates the local dashboard widget state.
 
-### 5.3. Template And Preset Management
+### 🎨 5.3. Template And Preset Management
 
 The **Templates & Presets** screen lets users create, edit, delete, filter, sort, and search dashboard templates and reusable widget presets.
 
@@ -131,7 +132,7 @@ The implemented management flow supports:
 
 After template or preset mutations, the page invalidates the affected TanStack Query caches so the template list, preset list, and dashboard preset options refresh from the backend.
 
-### 5.4. Data Export
+### 📤 5.4. Data Export
 
 The **Export Data** screen lets users export filtered alarm data from `/export`.
 
@@ -145,7 +146,7 @@ The implemented flow supports:
 6. Submitting one `POST /api/v1/export` request.
 7. Handling the response as a Blob and downloading it in the selected format.
 
-## API Rules
+## ⚖️ API Rules
 
 - Use `nettraceApi` and exported types from `src/services/generated/nettrace-api.ts`.
 - Do not invent endpoint paths, request fields, or response fields in UI code.
@@ -153,7 +154,7 @@ The implemented flow supports:
 - `VITE_API_BASE_URL` is the only frontend API base URL switch.
 - If `VITE_API_BASE_URL` points to a different origin, that frontend origin must be listed in the backend `CORS_ORIGINS` setting.
 
-## Design Notes
+## 🖌️ Design Notes
 
 - The implemented style is a dark NOC-focused interface with neon accent tokens.
 - Prefer existing components in `src/components/ui` and `src/components/shared`.

@@ -1,4 +1,12 @@
-# NetTrace NOC Analytics Platform
+<div align="center">
+
+# 🌐 NetTrace NOC Analytics Platform
+
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge&logo=github)
+![Docs](https://img.shields.io/badge/Docs-Updated-blue?style=for-the-badge&logo=markdown)
+![Platform](https://img.shields.io/badge/Platform-Web-orange?style=for-the-badge&logo=googlechrome)
+
+</div>
 
 > This project was developed as a Mini Project for Viettel Digital Talent 2026.
 > 
@@ -8,26 +16,26 @@ NetTrace is a Network Operations Center (NOC) analytics platform for exploring h
 
 ---
 
-## Table of Contents
+## 📖 Table of Contents
 
-- [NetTrace NOC Analytics Platform](#nettrace-noc-analytics-platform)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Key Features](#key-features)
-  - [System Architecture](#system-architecture)
-  - [Repository Structure](#repository-structure)
-  - [Technology Stack](#technology-stack)
-  - [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Running the Project](#running-the-project)
+- [🌐 NetTrace NOC Analytics Platform](#nettrace-noc-analytics-platform)
+  - [📖 Table of Contents](#table-of-contents)
+  - [🎯 Overview](#overview)
+  - [✨ Key Features](#key-features)
+  - [🏗️ System Architecture](#system-architecture)
+  - [📁 Repository Structure](#repository-structure)
+  - [🛠️ Technology Stack](#technology-stack)
+  - [🚀 Getting Started](#getting-started)
+    - [📋 Prerequisites](#prerequisites)
+    - [⚙️ Installation](#installation)
+    - [▶️ Running the Project](#running-the-project)
 
 
-## Overview
+## 🎯 Overview
 
 NetTrace provides a practical analytics workspace for NOC teams that need to inspect alarm records, understand incident distribution, track summary metrics, and prepare structured exports. The system separates the user-facing dashboard, the analytics API, and project documentation so each part can evolve independently while remaining aligned through shared API contracts and documentation.
 
-## Key Features
+## ✨ Key Features
 
 - 📊 Dashboard-oriented alarm analytics and KPI summaries
 - 🔎 Alarm exploration with filtering, sorting, search, and selectable display columns
@@ -51,7 +59,7 @@ Add screenshots under `assets/` and replace these paths when ready:
 </details>
 
 
-## System Architecture
+## 🏗️ System Architecture
 
 NetTrace follows a split-application architecture:
 
@@ -72,7 +80,7 @@ Backend Analytics API
 The frontend is responsible for the operator experience: dashboards, alarm tables, charts, template management, and export screens. The backend owns validation, API contracts, analytics queries, metadata enrichment, exports, and database access.
 
 
-## Repository Structure
+## 📁 Repository Structure
 
 This root repository acts as the central project hub. The frontend and backend should be cloned from their own repositories.
 
@@ -93,7 +101,7 @@ root
 | `assets` | Screenshots, diagrams, and visual assets for documentation |
 | `README.md` | Main project overview and setup guide |
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 | Layer | Technology | Purpose | Notes |
 | --- | --- | --- | --- |
@@ -108,11 +116,11 @@ root
 | Relational Database | PostgreSQL | Metadata and dashboard configuration | OLTP workload |
 | API Documentation | OpenAPI / Swagger | API contract documentation | Link placeholder below |
 
-## Getting Started
+## 🚀 Getting Started
 
 To run NetTrace locally, clone this documentation repository plus the separate frontend and backend repositories. This repository explains the project and keeps shared documentation, but the runnable applications live in their own codebases.
 
-### Prerequisites
+### 📋 Prerequisites
 
 - Node.js
 - npm
@@ -122,7 +130,7 @@ To run NetTrace locally, clone this documentation repository plus the separate f
 - PostgreSQL database
 - ClickHouse database
 
-### Installation
+### ⚙️ Installation
 
 ```bash
 # 1. Clone the root documentation repository
@@ -147,7 +155,7 @@ npm install
 > **Tip**
 > Replace `<ROOT_REPOSITORY_URL>`, `<FRONTEND_REPOSITORY_URL>`, and `<BACKEND_REPOSITORY_URL>` with the actual GitHub repository URLs.
 
-### Running the Project
+### ▶️ Running the Project
 
 Run the backend API:
 

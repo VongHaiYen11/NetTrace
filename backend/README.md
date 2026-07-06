@@ -1,6 +1,6 @@
 <div align="center">
 
-# NetTrace Backend API
+# 🔌 NetTrace Backend API
 
 Express + TypeScript service for alarm analytics, metadata federation, exports, templates, widgets, and presets.
 
@@ -10,12 +10,13 @@ Express + TypeScript service for alarm analytics, metadata federation, exports, 
 ![ClickHouse](https://img.shields.io/badge/ClickHouse-OLAP-FFCC01?style=for-the-badge&logo=clickhouse&logoColor=111)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-OLTP-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-Validation-3E67B1?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 </div>
 
 The backend exposes `/api/v1` endpoints for alarm detail queries, KPI summaries, generic analytics, heatmaps, exports, metadata options, and dashboard template management. ClickHouse stores high-volume alarm events; PostgreSQL stores metadata and dashboard configuration. The service layer federates data between both databases without direct cross-database joins.
 
-## Quick Start
+## ⚡ Quick Start
 
 ```bash
 npm install
@@ -25,7 +26,7 @@ npm run dev
 
 Swagger UI is mounted at `/api-docs` when the server is running.
 
-## Environment
+## 🌍 Environment
 
 Copy `.env.example` to `.env` and set the database connection values for the target environment.
 
@@ -43,7 +44,7 @@ CORS_ORIGINS=https://your-frontend-domain.com
 
 Requests without a browser `Origin` header, such as curl or server-to-server checks, are still allowed.
 
-## Scripts
+## 📜 Scripts
 
 | Command | Purpose |
 | --- | --- |
@@ -56,7 +57,7 @@ Requests without a browser `Origin` header, such as curl or server-to-server che
 | `npm run lint` | Run ESLint |
 | `npm run format` | Format backend TypeScript files |
 
-## Stack
+## 🛠️ Stack
 
 | Area | Libraries / Tools |
 | --- | --- |
@@ -70,7 +71,7 @@ Requests without a browser `Origin` header, such as curl or server-to-server che
 | Docs | Swagger JSDoc, Swagger UI |
 | Tests | Jest, ts-jest |
 
-## API Groups
+## 🛣️ API Groups
 
 | Domain | Endpoints |
 | --- | --- |
@@ -83,7 +84,7 @@ Requests without a browser `Origin` header, such as curl or server-to-server che
 | Templates | `GET /api/v1/templates`, `GET /api/v1/templates/:id`, `POST /api/v1/templates`, `PUT /api/v1/templates/:id`, `DELETE /api/v1/templates/:id` |
 | Presets | `GET /api/v1/presets`, `POST /api/v1/presets`, `PUT /api/v1/presets/:id`, `DELETE /api/v1/presets` |
 
-## Architecture
+## 🏗️ Architecture
 
 ```text
 HTTP Adapter → Controller → Service → Repository → Database
@@ -98,7 +99,7 @@ HTTP Adapter → Controller → Service → Repository → Database
 
 Express route modules are HTTP adapters for endpoint mapping, Swagger annotations, and Zod middleware registration; they are not counted as a separate backend layer.
 
-## Data Model
+## 🗄️ Data Model
 
 | Entity | Responsibility |
 | --- | --- |
@@ -115,7 +116,7 @@ Rules:
 - Preset fields are normalized by chart type; irrelevant fields are stored as `NULL`.
 - Table presets can store `table_columns`, `table_page_size`, and `table_record_limit`.
 
-## Performance Guardrails
+## 🏎️ Performance Guardrails
 
 | Guardrail | Value |
 | --- | --- |
@@ -128,14 +129,14 @@ Rules:
 
 Heavy analytics run in ClickHouse. Metadata enrichment is done in Node.js with hash maps and PostgreSQL batch lookups. Alarm tables use a `columns` query parameter so ClickHouse only selects fields the client needs. Requests can cover more than 90 days; services split those ranges into bounded ClickHouse queries and merge or stream the results before responding.
 
-## Verification
+## ✅ Verification
 
 ```bash
 npm run build
 npm test
 ```
 
-## Reference Docs
+## 📚 Reference Docs
 
 | Document | Purpose |
 | --- | --- |
