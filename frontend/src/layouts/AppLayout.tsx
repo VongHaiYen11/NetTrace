@@ -30,6 +30,9 @@ const navItems = [
 ];
 
 export function AppLayout() {
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window === 'undefined' ? true : window.matchMedia('(min-width: 1024px)').matches,
+  );
   const [sidebarOpen, setSidebarOpen] = useState(() =>
     typeof window === 'undefined' ? true : window.matchMedia('(min-width: 1024px)').matches,
   );
@@ -39,7 +42,10 @@ export function AppLayout() {
   useEffect(() => {
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     const syncSidebar = (event: MediaQueryListEvent | MediaQueryList) => {
-      if (!event.matches) {
+      setIsDesktop(event.matches);
+      if (event.matches) {
+        setSidebarOpen(true);
+      } else {
         setSidebarOpen(false);
       }
     };
@@ -52,10 +58,33 @@ export function AppLayout() {
   return (
     <div className="min-h-screen text-light">
       <div className="flex">
+        {!isDesktop && sidebarOpen ? (
+          <div
+            className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+          />
+        ) : null}
+        {!isDesktop && !sidebarOpen ? (
+          <Button
+            className="fixed left-4 top-4 z-40 border border-primary/60 bg-background-alt/95 text-primary shadow-2xl backdrop-blur"
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation"
+            title="Open navigation"
+          >
+            <PanelLeftOpen size={18} />
+          </Button>
+        ) : null}
         <aside
           className={cn(
-            'sticky top-0 z-40 h-screen shrink-0 border-r border-white/10 bg-background-alt py-6 transition-[width] duration-200',
-            sidebarOpen ? 'w-64 px-4' : 'w-20 px-3',
+            'h-screen shrink-0 border-r border-white/10 bg-background-alt py-6 transition-all duration-200',
+            isDesktop
+              ? cn('sticky top-0 z-40', sidebarOpen ? 'w-64 px-4' : 'w-20 px-3')
+              : cn(
+                  'fixed bottom-0 left-0 top-0 z-50 w-64 px-4 shadow-2xl',
+                  sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+                ),
           )}
         >
           <div
@@ -78,6 +107,7 @@ export function AppLayout() {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen((value) => !value)}
+              aria-label={sidebarOpen ? 'Collapse navigation' : 'Open navigation'}
             >
               {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
               <span className="sr-only">
@@ -93,6 +123,9 @@ export function AppLayout() {
                 <NavLink
                   key={item.to}
                   to={item.to}
+                  onClick={() => {
+                    if (!isDesktop) setSidebarOpen(false);
+                  }}
                   title={!sidebarOpen ? item.label : undefined}
                   className={({ isActive }) =>
                     cn(

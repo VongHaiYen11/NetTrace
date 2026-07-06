@@ -152,11 +152,11 @@ function ControlMenu({
   const highlighted = open || active;
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative w-full sm:w-auto">
       <button
         type="button"
         onClick={() => setOpen((p) => !p)}
-        className={`flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors ${
+        className={`flex h-10 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm font-medium transition-colors sm:w-auto ${
           highlighted
             ? 'bg-white/[0.06] text-white'
             : 'text-muted hover:bg-white/[0.05] hover:text-white'
@@ -180,7 +180,7 @@ function ControlMenu({
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-full z-30 mt-2 w-[min(18rem,calc(100vw-2rem))] overflow-hidden rounded-lg bg-panel-light/95 p-4 shadow-xl backdrop-blur-xl">
+        <div className="absolute left-1/2 top-full z-30 mt-2 max-h-[min(75vh,24rem)] w-[calc(100vw-2rem)] max-w-72 -translate-x-1/2 overflow-y-auto rounded-lg bg-panel-light/95 p-4 shadow-xl backdrop-blur-xl">
           {children}
         </div>
       ) : null}

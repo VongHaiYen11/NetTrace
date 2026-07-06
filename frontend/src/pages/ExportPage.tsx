@@ -176,7 +176,7 @@ function MultiChoiceSelect({
         </button>
 
         {open ? (
-          <div className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-lg border border-border bg-panel p-2 shadow-2xl">
+          <div className="absolute left-0 top-full z-40 mt-2 w-full min-w-0 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-border bg-panel p-2 shadow-2xl">
             {searchable ? (
               <Input
                 value={search}

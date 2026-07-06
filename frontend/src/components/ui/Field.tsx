@@ -193,7 +193,7 @@ function Select(
       </button>
 
       {open ? (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-64 overflow-y-auto rounded-lg border border-border bg-panel p-2 shadow-2xl">
+        <div className="absolute left-0 top-full z-50 mt-2 max-h-[min(16rem,calc(100vh-8rem))] min-w-full max-w-[min(22rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-border bg-panel p-2 shadow-2xl">
           {options.map((option) => {
             const optionValue = String(option.props.value ?? '');
             const selected = optionValue === selectedValue;
@@ -210,7 +210,7 @@ function Select(
                     : 'text-muted hover:bg-white/[0.04] hover:text-bright',
                 )}
               >
-                <span>{getOptionLabel(option)}</span>
+                <span className="min-w-0 truncate">{getOptionLabel(option)}</span>
               </button>
             );
           })}

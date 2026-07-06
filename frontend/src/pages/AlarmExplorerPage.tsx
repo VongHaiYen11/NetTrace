@@ -199,7 +199,7 @@ function MultiChoiceSelect({
           />
         </button>
         {open ? (
-          <div className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-lg border border-border bg-panel p-2 shadow-2xl">
+          <div className="absolute left-0 top-full z-40 mt-2 w-full min-w-0 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-border bg-panel p-2 shadow-2xl">
             {searchable ? (
               <Input
                 value={search}
@@ -498,7 +498,7 @@ export function AlarmExplorerPage() {
                     Filter
                   </Button>
                   {filtersOpen ? (
-                    <div className="absolute right-0 top-full z-30 mt-2 w-[min(42rem,calc(100vw-3rem))] rounded-lg border border-border bg-panel p-4 shadow-2xl">
+                    <div className="absolute left-0 top-full z-30 mt-2 max-h-[min(75vh,34rem)] w-[calc(100vw-2rem)] max-w-[42rem] overflow-y-auto rounded-lg border border-border bg-panel p-4 shadow-2xl">
                       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                         <Field label="From date" labelVariant="nested">
                           <DatePicker value={fromDate} onChange={(value) => { setFromDate(value); resetPaging(); }} placeholder="From date" />
@@ -599,7 +599,7 @@ export function AlarmExplorerPage() {
                     Sort
                   </Button>
                   {sortOpen ? (
-                    <div className="absolute right-0 top-full z-30 mt-2 w-72 rounded-lg border border-border bg-panel p-4 shadow-2xl">
+                    <div className="absolute left-0 top-full z-30 mt-2 max-h-[min(75vh,24rem)] w-[calc(100vw-2rem)] max-w-72 overflow-y-auto rounded-lg border border-border bg-panel p-4 shadow-2xl">
                       <div className="grid gap-3">
                         <Field label="Sort by" labelVariant="nested">
                           <Select
@@ -645,7 +645,7 @@ export function AlarmExplorerPage() {
                     Fields
                   </Button>
                   {columnsOpen ? (
-                    <div className="absolute right-0 top-full z-30 mt-2 w-64 rounded-lg border border-border bg-panel p-2 shadow-2xl">
+                    <div className="absolute right-0 top-full z-30 mt-2 max-h-[min(75vh,24rem)] w-[calc(100vw-2rem)] max-w-64 overflow-y-auto rounded-lg border border-border bg-panel p-2 shadow-2xl">
                       <div className="mb-2 flex gap-2 border-b border-white/10 pb-2">
                         <Button
                           size="sm"
