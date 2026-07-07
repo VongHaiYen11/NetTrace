@@ -81,7 +81,7 @@ The implemented flow supports:
 
 1. Filtering by time range, severity, status, device ID, device name, device type, vendor, station, station ID, province, and error code.
 2. Backend-backed search by one selected field such as alarm ID, device ID, device name, device type, error code, error name, severity, status, description, or raw log.
-3. Sorting by the backend-supported fields: timestamp, severity, or status.
+3. Sorting by the backend-supported fields: timestamp or severity.
 4. Offset/limit pagination and configurable page size.
 5. User-selected table columns.
 6. Metadata option loading through `GET /api/v1/metadata/options` for device type, vendor, and province dropdowns.

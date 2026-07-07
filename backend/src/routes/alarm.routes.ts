@@ -353,7 +353,7 @@ router.get(
  *         name: sort_by
  *         schema:
  *           type: string
- *           enum: [timestamp, severity, status]
+ *           enum: [timestamp, severity]
  *           default: timestamp
  *       - in: query
  *         name: sort_order
@@ -648,7 +648,7 @@ router.post('/analytics/heatmap', validateBody(HeatmapSchema), heatmapController
  *                       type: string
  *                   sort_by:
  *                     type: string
- *                     enum: [timestamp, severity, status]
+ *                     enum: [timestamp, severity]
  *                   sort_order:
  *                     type: string
  *                     enum: [asc, desc]

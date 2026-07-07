@@ -42,8 +42,8 @@ const COLUMN_OPTIONS: Array<{ key: AlarmColumnKey; label: string; sortable?: Sor
   sortable:
     option.key === 'time_created'
       ? 'timestamp'
-      : option.key === 'severity' || option.key === 'status'
-        ? option.key
+      : option.key === 'severity'
+        ? 'severity'
         : undefined,
 }));
 
@@ -62,7 +62,6 @@ const ALARM_DETAIL_COLUMNS: AlarmColumn[] = ALARM_COLUMN_OPTIONS.map((option) =>
 const SORT_OPTIONS: Array<{ value: SortBy; label: string }> = [
   { value: 'timestamp', label: 'Created time' },
   { value: 'severity', label: 'Severity' },
-  { value: 'status', label: 'Status' },
 ];
 
 const SEARCH_FIELD_OPTIONS: Array<{ value: AlarmSearchField; label: string }> = [
@@ -624,8 +623,8 @@ export function AlarmExplorerPage() {
                               resetPaging();
                             }}
                           >
-                            <option value="desc">Newest / highest first</option>
-                            <option value="asc">Oldest / lowest first</option>
+                            <option value="desc">Descending</option>
+                            <option value="asc">Ascending</option>
                           </Select>
                         </Field>
                       </div>

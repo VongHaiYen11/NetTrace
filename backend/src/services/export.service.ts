@@ -155,7 +155,7 @@ export class ExportService {
         station?: string[];
         station_id?: string[];
         province?: string[];
-        sort_by?: 'timestamp' | 'severity' | 'status';
+        sort_by?: 'timestamp' | 'severity';
         sort_order?: 'asc' | 'desc';
         limit?: number;
       };

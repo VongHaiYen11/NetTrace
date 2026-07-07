@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { DateStringSchema, QueryArraySchema } from './shared.js';
 
-const SORT_BY_WHITELIST = ['timestamp', 'severity', 'status'] as const;
+const SORT_BY_WHITELIST = ['timestamp', 'severity'] as const;
 const SORT_ORDER_WHITELIST = ['asc', 'desc'] as const;
 const SEARCH_FIELD_WHITELIST = [
   'alarm_id',

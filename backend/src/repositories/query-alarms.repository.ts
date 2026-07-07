@@ -22,7 +22,7 @@ export interface QueryAlarmsParams {
   status?: string[];
   device_id?: string[];
   error_code?: string[];
-  sort_by: 'timestamp' | 'severity' | 'status';
+  sort_by: 'timestamp' | 'severity';
   sort_order: 'asc' | 'desc';
   include_total?: boolean;
   columns?: AlarmColumn[];
@@ -126,7 +126,6 @@ function resolveSelectedColumns(params: QueryAlarmsParams): string {
 
   if (params.sort_by === 'timestamp') selected.add('time_created');
   if (params.sort_by === 'severity') selected.add('severity');
-  if (params.sort_by === 'status') selected.add('status');
 
   if (params.search && params.search_field === 'description') selected.add('description');
   if (params.search && params.search_field === 'raw_log') selected.add('raw_log');
@@ -194,7 +193,6 @@ export class QueryAlarmsRepository {
     const sortFieldMap: Record<string, string> = {
       timestamp: 'time_created',
       severity: 'severity',
-      status: 'status',
     };
     const orderColumn = sortFieldMap[sort_by] || 'time_created';
     const orderDirection = sort_order === 'asc' ? 'ASC' : 'DESC';
@@ -242,7 +240,7 @@ export class QueryAlarmsRepository {
     status?: string[];
     device_id?: string[];
     error_code?: string[];
-    sort_by?: 'timestamp' | 'severity' | 'status';
+    sort_by?: 'timestamp' | 'severity';
     sort_order?: 'asc' | 'desc';
     limit?: number;
   }) {
@@ -264,7 +262,6 @@ export class QueryAlarmsRepository {
     const sortFieldMap: Record<string, string> = {
       timestamp: 'time_created',
       severity: 'severity',
-      status: 'status',
     };
     const orderColumn = sortFieldMap[sort_by] || 'time_created';
     const orderDirection = sort_order === 'asc' ? 'ASC' : 'DESC';

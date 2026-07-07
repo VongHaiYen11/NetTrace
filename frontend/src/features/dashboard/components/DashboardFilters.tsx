@@ -15,17 +15,15 @@ const filterSchema = z.object({
   deviceId: z.string(),
   errorCode: z.string(),
   province: z.string(),
-  sortBy: z.enum(['timestamp', 'severity', 'status']),
+  sortBy: z.enum(['timestamp', 'severity']),
   sortOrder: z.enum(['desc', 'asc']),
 });
 
 const sortOptions = [
-  { value: 'timestamp:desc', label: 'Newest first' },
-  { value: 'timestamp:asc', label: 'Oldest first' },
-  { value: 'severity:desc', label: 'Severity high to low' },
-  { value: 'severity:asc', label: 'Severity low to high' },
-  { value: 'status:desc', label: 'Status Z to A' },
-  { value: 'status:asc', label: 'Status A to Z' },
+  { value: 'timestamp:desc', label: 'Timestamp / Descending' },
+  { value: 'timestamp:asc', label: 'Timestamp / Ascending' },
+  { value: 'severity:desc', label: 'Severity / Descending' },
+  { value: 'severity:asc', label: 'Severity / Ascending' },
 ] as const;
 
 interface DashboardFiltersProps {

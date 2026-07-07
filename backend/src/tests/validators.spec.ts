@@ -72,6 +72,11 @@ describe('Validation Layer Tests', () => {
       expect(result.success).toBe(false);
     });
 
+    it('should reject status as a sort field', () => {
+      const result = QueryAlarmsSchema.safeParse({ sort_by: 'status' });
+      expect(result.success).toBe(false);
+    });
+
     it('should parse performance controls and selected columns', () => {
       const defaults = QueryAlarmsSchema.parse({});
       expect(defaults.include_total).toBe(true);
@@ -190,6 +195,16 @@ describe('Validation Layer Tests', () => {
       expect(parsed.filters.sort_by).toBe('severity');
       expect(parsed.filters.sort_order).toBe('asc');
       expect(parsed.filters.limit).toBe(100);
+    });
+
+    it('should reject status as an export sort field', () => {
+      const result = ExportSchema.safeParse({
+        format: 'csv',
+        filters: {
+          sort_by: 'status',
+        },
+      });
+      expect(result.success).toBe(false);
     });
   });
 

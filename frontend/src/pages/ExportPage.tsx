@@ -75,6 +75,16 @@ const FORMAT_EXTENSION: Record<ExportFormat, string> = {
   json: 'json',
 };
 
+const SORT_BY_LABEL: Record<SortBy, string> = {
+  timestamp: 'Timestamp',
+  severity: 'Severity',
+};
+
+const SORT_ORDER_LABEL: Record<SortOrder, string> = {
+  desc: 'Descending',
+  asc: 'Ascending',
+};
+
 function normalizeExportLimit(value: unknown) {
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) return 1000;
@@ -488,7 +498,6 @@ export function ExportPage() {
                 <Select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)}>
                   <option value="timestamp">Timestamp</option>
                   <option value="severity">Severity</option>
-                  <option value="status">Status</option>
                 </Select>
               </Field>
               <Field label="Direction">
@@ -496,8 +505,8 @@ export function ExportPage() {
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value as SortOrder)}
                 >
-                  <option value="desc">Newest first</option>
-                  <option value="asc">Oldest first</option>
+                  <option value="desc">Descending</option>
+                  <option value="asc">Ascending</option>
                 </Select>
               </Field>
               <Field label="Device ID" hint="Separate multiple values with commas.">
@@ -581,7 +590,7 @@ export function ExportPage() {
               {[
                 { label: 'Format', value: format.toUpperCase(), accent: true },
                 { label: 'Columns', value: columns.length.toString() },
-                { label: 'Sort', value: `${sortBy} / ${sortOrder}` },
+                { label: 'Sort', value: `${SORT_BY_LABEL[sortBy]} / ${SORT_ORDER_LABEL[sortOrder]}` },
                 { label: 'Limit', value: normalizeExportLimit(limit).toLocaleString() },
               ].map((item) => (
                 <div

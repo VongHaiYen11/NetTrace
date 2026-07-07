@@ -34,7 +34,7 @@ export const ExportSchema = z.object({
   format: z.enum(['csv', 'xlsx', 'json']),
   columns: z.array(z.enum(EXPORT_COLUMNS)).optional(),
   filters: CommonAnalyticsFilterSchema.extend({
-    sort_by: z.enum(['timestamp', 'severity', 'status']).optional(),
+    sort_by: z.enum(['timestamp', 'severity']).optional(),
     sort_order: z.enum(['asc', 'desc']).optional(),
     limit: z.number().int().min(1).optional(),
   })

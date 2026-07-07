@@ -1,6 +1,6 @@
 export type Severity = 'critical' | 'major' | 'minor' | 'warning' | 'info' | string;
 export type AlarmStatus = 'active' | 'archived' | string;
-export type SortBy = 'timestamp' | 'severity' | 'status';
+export type SortBy = 'timestamp' | 'severity';
 export type SortOrder = 'asc' | 'desc';
 export type AlarmSearchField =
   | 'alarm_id'

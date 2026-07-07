@@ -297,7 +297,6 @@ export class QueryAlarmsService {
     const direction = sortOrder === 'asc' ? 1 : -1;
     const getValue = (record: typeof a) => {
       if (sortBy === 'severity') return record.severity;
-      if (sortBy === 'status') return record.status;
       return record.time_created;
     };
 

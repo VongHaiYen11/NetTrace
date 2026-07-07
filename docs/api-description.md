@@ -174,6 +174,7 @@ Supports:
 - backend search with `search` and one `search_field`
 - `offset`, `limit`
 - `sort_by`, `sort_order`
+- Supported `sort_by` values: `timestamp`, `severity`
 - `include_total=false` to skip count
 - `columns=...` to select response columns and avoid fetching unused large text fields
 
