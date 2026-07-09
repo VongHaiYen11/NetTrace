@@ -36,7 +36,7 @@ export const ExportSchema = z.object({
   filters: CommonAnalyticsFilterSchema.extend({
     sort_by: z.enum(['timestamp', 'severity']).optional(),
     sort_order: z.enum(['asc', 'desc']).optional(),
-    limit: z.number().int().min(1).optional(),
+    limit: z.number().int().min(1).max(10000).optional(),
   })
     .optional()
     .default({}),

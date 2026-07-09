@@ -120,6 +120,7 @@ The heatmap response is already aggregated and does not return raw alarm rows.
 - CSV, XLSX, and JSON are streamed to avoid loading the full export in memory.
 - XLSX uses `exceljs`.
 - PostgreSQL metadata is resolved only when selected export columns require enrichment.
+- Export `limit` is capped at 10,000 rows per request.
 
 ## Retrieval Performance Techniques
 

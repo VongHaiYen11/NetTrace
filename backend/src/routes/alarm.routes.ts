@@ -655,6 +655,7 @@ router.post('/analytics/heatmap', validateBody(HeatmapSchema), heatmapController
  *                   limit:
  *                     type: integer
  *                     minimum: 1
+ *                     maximum: 10000
  *                     example: 100
  *     responses:
  *       200:

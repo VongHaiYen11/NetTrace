@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ElementType } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
+  AlertTriangle,
   Check,
   ChevronDown,
   Download,
@@ -74,6 +75,7 @@ const FORMAT_EXTENSION: Record<ExportFormat, string> = {
   xlsx: 'xlsx',
   json: 'json',
 };
+const EXPORT_LIMIT_MAX = 10_000;
 
 const SORT_BY_LABEL: Record<SortBy, string> = {
   timestamp: 'Timestamp',
@@ -88,7 +90,40 @@ const SORT_ORDER_LABEL: Record<SortOrder, string> = {
 function normalizeExportLimit(value: unknown) {
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) return 1000;
-  return Math.max(1, Math.trunc(numericValue));
+  return Math.min(EXPORT_LIMIT_MAX, Math.max(1, Math.trunc(numericValue)));
+}
+
+function LimitWarningModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="export-limit-warning-title"
+        className="w-full max-w-md rounded-lg border border-warning/50 bg-surface p-5 shadow-export-panel"
+      >
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded border border-warning/50 bg-warning/15 text-warning">
+            <AlertTriangle size={20} />
+          </span>
+          <div>
+            <h2 id="export-limit-warning-title" className="text-lg font-black text-bright">
+              Export limit adjusted
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-medium">
+              Export downloads are capped at 10,000 rows per request. The limit was changed to
+              10,000 automatically.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 flex justify-end">
+          <Button onClick={onClose}>Close</Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function splitCsv(value: string) {
@@ -305,6 +340,7 @@ export function ExportPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [limit, setLimit] = useState<number | ''>(1000);
   const [exporting, setExporting] = useState(false);
+  const [limitWarningOpen, setLimitWarningOpen] = useState(false);
   const activeFormat = FORMAT_OPTIONS.find((item) => item.value === format) ?? FORMAT_OPTIONS[0];
   const ActiveFormatIcon = activeFormat.icon;
 
@@ -312,6 +348,22 @@ export function ExportPage() {
     setColumns((current) =>
       current.includes(column) ? current.filter((item) => item !== column) : [...current, column],
     );
+  }
+
+  function handleLimitChange(value: string) {
+    if (value === '') {
+      setLimit('');
+      return;
+    }
+
+    const numericValue = Number(value);
+    if (Number.isFinite(numericValue) && numericValue > EXPORT_LIMIT_MAX) {
+      setLimit(EXPORT_LIMIT_MAX);
+      setLimitWarningOpen(true);
+      return;
+    }
+
+    setLimit(numericValue);
   }
 
   async function handleExport() {
@@ -369,6 +421,7 @@ export function ExportPage() {
         accent="Data"
         description="Download alarm records with the format, columns, filters, and sorting you need."
       />
+      <LimitWarningModal open={limitWarningOpen} onClose={() => setLimitWarningOpen(false)} />
 
       <section className="grid gap-4 lg:grid-cols-3">
         {FORMAT_OPTIONS.map((option) => {
@@ -473,8 +526,9 @@ export function ExportPage() {
                 <Input
                   type="number"
                   min={1}
+                  max={EXPORT_LIMIT_MAX}
                   value={limit}
-                  onChange={(e) => setLimit(e.target.value === '' ? '' : Number(e.target.value))}
+                  onChange={(e) => handleLimitChange(e.target.value)}
                   onBlur={() => setLimit((current) => normalizeExportLimit(current))}
                 />
               </Field>

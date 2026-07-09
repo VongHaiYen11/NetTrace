@@ -197,6 +197,16 @@ describe('Validation Layer Tests', () => {
       expect(parsed.filters.limit).toBe(100);
     });
 
+    it('should reject export limit higher than 10000', () => {
+      const result = ExportSchema.safeParse({
+        format: 'csv',
+        filters: {
+          limit: 10001,
+        },
+      });
+      expect(result.success).toBe(false);
+    });
+
     it('should reject status as an export sort field', () => {
       const result = ExportSchema.safeParse({
         format: 'csv',
