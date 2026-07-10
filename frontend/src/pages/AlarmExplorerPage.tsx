@@ -497,7 +497,7 @@ export function AlarmExplorerPage() {
                     Filter
                   </Button>
                   {filtersOpen ? (
-                    <div className="absolute left-0 top-full z-30 mt-2 max-h-[min(75vh,34rem)] w-[calc(100vw-2rem)] max-w-[42rem] overflow-y-auto rounded-lg border border-border bg-panel p-4 shadow-2xl">
+                    <div className="absolute left-0 top-full z-30 mt-2 max-h-[min(75vh,34rem)] w-[calc(100vw-2rem)] max-w-[42rem] overflow-y-auto rounded-lg border border-border bg-panel p-4 shadow-2xl xl:left-auto xl:right-0">
                       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                         <Field label="From date" labelVariant="nested">
                           <DatePicker value={fromDate} onChange={(value) => { setFromDate(value); resetPaging(); }} placeholder="From date" />
@@ -598,7 +598,7 @@ export function AlarmExplorerPage() {
                     Sort
                   </Button>
                   {sortOpen ? (
-                    <div className="absolute left-0 top-full z-30 mt-2 max-h-[min(75vh,24rem)] w-[calc(100vw-2rem)] max-w-72 overflow-y-auto rounded-lg border border-border bg-panel p-4 shadow-2xl">
+                    <div className="absolute left-0 top-full z-30 mt-2 max-h-[min(75vh,24rem)] w-[calc(100vw-2rem)] max-w-72 overflow-y-auto rounded-lg border border-border bg-panel p-4 shadow-2xl xl:left-auto xl:right-0">
                       <div className="grid gap-3">
                         <Field label="Sort by" labelVariant="nested">
                           <Select
